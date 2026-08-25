@@ -1,1 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <title>SHE-SHIELD | Your Safety, Our Priority</title>
+
+    <meta
+        name="description"
+        content="SHE-SHIELD - Women's Safety and Emergency Response Platform"
+    >
+
+    <link rel="icon" type="image/png" href="she-shield-logo.png">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- =====================================================
+     SPLASH SCREEN
+===================================================== -->
+
+<div id="splashScreen" class="splash-screen">
+
+    <div class="splash-decoration splash-decoration-one"></div>
+    <div class="splash-decoration splash-decoration-two"></div>
+
+    <div class="splash-content">
+
+        <img
+            src="she-shield-logo.png"
+            alt="SHE-SHIELD Logo"
+            class="splash-logo"
+        >
+
+        <h1>SHE-SHIELD</h1>
+
+        <p>Your Safety. Our Priority.</p>
+
+        <div class="loading-bar">
+            <span></span>
+        </div>
+
+        <small>SECURE • PRIVATE • SUPPORTIVE</small>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     APP
+===================================================== -->
+
+<div id="app" class="app hidden">
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <div class="brand">
+
+            <img
+                src="she-shield-logo.png"
+                alt="SHE-SHIELD"
+            >
+
+            <div>
+                <h2>SHE-SHIELD</h2>
+                <span data-i18n="tagline">
+                    Your Safety. Our Priority.
+                </span>
+            </div>
+
+        </div>
+
+
+        <nav class="desktop-nav">
+
+            <button data-page="home">
+                Home
+            </button>
+
+            <button data-page="safety">
+                Safety
+            </button>
+
+            <button data-page="helplines">
+                Support
+            </button>
+
+        </nav>
+
+
+        <div class="header-actions">
+
+            <div class="language-box">
+
+                <span>🌐</span>
+
+                <select id="languageSelect">
+
+                    <option value="en">English</option>
+                    <option value="kn">ಕನ್ನಡ</option>
+                    <option value="te">తెలుగు</option>
+                    <option value="ta">தமிழ்</option>
+                    <option value="hi">हिन्दी</option>
+
+                </select>
+
+            </div>
+
+            <button
+                id="menuButton"
+                class="menu-button"
+            >
+                ☰
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- MOBILE MENU -->
+
+    <aside
+        id="mobileMenu"
+        class="mobile-menu"
+    >
+
+        <div class="mobile-menu-head">
+
+            <img src="she-shield-logo.png" alt="SHE-SHIELD">
+
+            <button id="closeMenu">
+                ×
+            </button>
+
+        </div>
+
+        <button data-page="home">
+            🏠 Home
+        </button>
+
+        <button data-page="emergency">
+            🚨 Emergency SOS
+        </button>
+
+        <button data-page="safety">
+            🛡 Immediate Safety
+        </button>
+
+        <button data-feature="contacts">
+            👥 Trusted Contacts
+        </button>
+
+        <button data-feature="evidence">
+            📷 Capture Evidence
+        </button>
+
+        <button data-feature="fakeCall">
+            📞 Fake Calling
+        </button>
+
+        <button data-feature="tips">
+            💡 Safety Tips
+        </button>
+
+        <button data-feature="helplines">
+            ☎ Helplines
+        </button>
+
+        <button data-feature="battery">
+            🔋 Battery Saver
+        </button>
+
+        <button data-feature="issues">
+            📝 Customer Issues
+        </button>
+
+    </aside>
+
+
+    <main>
+
+        <!-- =================================================
+             HOME
+        ================================================== -->
+
+        <section
+            id="home"
+            class="page active-page"
+        >
+
+            <div class="home-layout">
+
+                <div class="home-art">
+
+                    <div class="gold-orbit"></div>
+
+                    <img
+                        src="she-shield-logo.png"
+                        alt="SHE-SHIELD Logo"
+                    >
+
+                </div>
+
+
+                <div class="home-content">
+
+                    <span class="eyebrow">
+                        SHE-SHIELD • WOMEN'S SAFETY
+                    </span>
+
+                    <h1>
+                        Your Safety.
+                        <br>
+                        <span>Your Priority.</span>
+                    </h1>
+
+                    <p class="home-description">
+                        A private safety platform designed to
+                        help you respond quickly, stay connected
+                        and access support when it matters most.
+                    </p>
+
+
+                    <div class="home-actions">
+
+                        <button
+                            class="main-card emergency-card"
+                            data-page="emergency"
+                        >
+
+                            <div class="main-card-icon">
+                                🚨
+                            </div>
+
+                            <div>
+
+                                <small>
+                                    EMERGENCY
+                                </small>
+
+                                <h2>
+                                    Emergency SOS
+                                </h2>
+
+                                <p>
+                                    Get immediate emergency assistance.
+                                </p>
+
+                                <strong>
+                                    Activate SOS →
+                                </strong>
+
+                            </div>
+
+                        </button>
+
+
+                        <button
+                            class="main-card safety-card"
+                            data-page="safety"
+                        >
+
+                            <div class="main-card-icon">
+                                🛡️
+                            </div>
+
+                            <div>
+
+                                <small>
+                                    PROTECTION
+                                </small>
+
+                                <h2>
+                                    Immediate Safety
+                                </h2>
+
+                                <p>
+                                    Access your complete safety toolkit.
+                                </p>
+
+                                <strong>
+                                    Explore Safety →
+                                </strong>
+
+                            </div>
+
+                        </button>
+
+                    </div>
+
+
+                    <div class="home-features">
+
+                        <span>
+                            ✦ FAST RESPONSE
+                        </span>
+
+                        <span>
+                            ✦ PRIVATE BY DESIGN
+                        </span>
+
+                        <span>
+                            ✦ MULTILINGUAL
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             EMERGENCY
+        ================================================== -->
+
+        <section
+            id="emergency"
+            class="page"
+        >
+
+            <div class="page-top">
+
+                <button
+                    class="back-button"
+                    data-page="home"
+                >
+                    ← Home
+                </button>
+
+                <div class="page-language">
+
+                    <span>🌐</span>
+
+                    <select class="pageLanguageSelect">
+
+                        <option value="en">English</option>
+                        <option value="kn">ಕನ್ನಡ</option>
+                        <option value="te">తెలుగు</option>
+                        <option value="ta">தமிழ்</option>
+                        <option value="hi">हिन्दी</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="page-heading">
+
+                <span class="eyebrow">
+                    EMERGENCY RESPONSE
+                </span>
+
+                <h1>
+                    Emergency SOS
+                </h1>
+
+                <p>
+                    Use this when you need immediate emergency assistance.
+                </p>
+
+            </div>
+
+
+            <div class="emergency-panel">
+
+                <div class="live-status">
+                    <span></span>
+                    <label id="emergencyStatus">
+                        Emergency system ready
+                    </label>
+                </div>
+
+
+                <button
+                    id="mainSOS"
+                    class="sos-button"
+                >
+
+                    <div class="sos-inner">
+
+                        <span>!</span>
+
+                        <strong>
+                            SOS
+                        </strong>
+
+                        <small>
+                            PRESS TO ACTIVATE
+                        </small>
+
+                    </div>
+
+                </button>
+
+
+                <div
+                    id="emergencyCountdown"
+                    class="countdown hidden"
+                >
+                    10
+                </div>
+
+
+                <button
+                    id="stopEmergency"
+                    class="stop-button hidden"
+                >
+                    STOP EMERGENCY
+                </button>
+
+
+                <div class="emergency-actions">
+
+                    <button id="emergencyCall">
+                        📞
+                        <span>Call 112</span>
+                    </button>
+
+                    <button id="emergencyLocation">
+                        📍
+                        <span>Share Location</span>
+                    </button>
+
+                    <button id="emergencySiren">
+                        🔊
+                        <span>Siren</span>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             IMMEDIATE SAFETY
+        ================================================== -->
+
+        <section
+            id="safety"
+            class="page"
+        >
+
+            <div class="page-top">
+
+                <button
+                    class="back-button"
+                    data-page="home"
+                >
+                    ← Home
+                </button>
+
+                <div class="page-language">
+
+                    <span>🌐</span>
+
+                    <select class="pageLanguageSelect">
+
+                        <option value="en">English</option>
+                        <option value="kn">ಕನ್ನಡ</option>
+                        <option value="te">తెలుగు</option>
+                        <option value="ta">தமிழ்</option>
+                        <option value="hi">हिन्दी</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="page-heading">
+
+                <span class="eyebrow">
+                    IMMEDIATE SAFETY
+                </span>
+
+                <h1>
+                    Safety Command Center
+                </h1>
+
+                <p>
+                    Choose the safety tool you need.
+                </p>
+
+            </div>
+
+
+            <div class="feature-grid">
+
+                <button
+                    class="feature-card"
+                    data-feature="contacts"
+                >
+
+                    <div class="feature-icon">
+                        👥
+                    </div>
+
+                    <h3>
+                        Trusted Contacts
+                    </h3>
+
+                    <p>
+                        Save a minimum of five trusted contacts.
+                    </p>
+
+                    <span>
+                        Manage →
+                    </span>
+
+                </button>
+
+
+                <button
+                    id="silentSOS"
+                    class="feature-card"
+                >
+
+                    <div class="feature-icon">
+                        🔇
+                    </div>
+
+                    <h3>
+                        Silent SOS
+                    </h3>
+
+                    <p>
+                        Share your location without siren or flash.
+                    </p>
+
+                    <span>
+                        Activate →
+                    </span>
+
+                </button>
+
+
+                <button
+                    id="voiceSOS"
+                    class="feature-card"
+                >
+
+                    <div class="feature-icon">
+                        🎙️
+                    </div>
+
+                    <h3>
+                        Voice SOS
+                    </h3>
+
+                    <p>
+                        Say “phone” to trigger SOS.
+                    </p>
+
+                    <span>
+                        Start →
+                    </span>
+
+                </button>
+
+
+                <button
+                    id="shakeSOS"
+                    class="feature-card"
+                >
+
+                    <div class="feature-icon">
+                        📳
+                    </div>
+
+                    <h3>
+                        Shake SOS
+                    </h3>
+
+                    <p>
+                        Shake your phone to trigger SOS.
+                    </p>
+
+                    <span>
+                        Enable →
+                    </span>
+
+                </button>
+
+
+                <button
+                    id="autoSOS"
+                    class="feature-card"
+                >
+
+                    <div class="feature-icon">
+                        ⏱️
+                    </div>
+
+                    <h3>
+                        Auto SOS
+                    </h3>
+
+                    <p>
+                        Ten-second countdown with stop button.
+                    </p>
+
+                    <span>
+                        Start →
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="feature-card"
+                    data-feature="evidence"
+                >
+
+                    <div class="feature-icon">
+                        📷
+                    </div>
+
+                    <h3>
+                        Capture Evidence
+                    </h3>
+
+                    <p>
+                        Capture photos, videos, audio and files.
+                    </p>
+
+                    <span>
+                        Open →
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="feature-card"
+                    data-feature="fakeCall"
+                >
+
+                    <div class="feature-icon">
+                        📞
+                    </div>
+
+                    <h3>
+                        Fake Calling
+                    </h3>
+
+                    <p>
+                        Realistic strict father-style call.
+                    </p>
+
+                    <span>
+                        Simulate →
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="feature-card"
+                    data-feature="tips"
+                >
+
+                    <div class="feature-icon">
+                        💡
+                    </div>
+
+                    <h3>
+                        Safety Tips
+                    </h3>
+
+                    <p>
+                        Practical tips for safer situations.
+                    </p>
+
+                    <span>
+                        Read →
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="feature-card"
+                    data-feature="helplines"
+                >
+
+                    <div class="feature-icon">
+                        ☎️
+                    </div>
+
+                    <h3>
+                        Helplines
+                    </h3>
+
+                    <p>
+                        Police, ambulance, women and support.
+                    </p>
+
+                    <span>
+                        View →
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="feature-card"
+                    data-feature="battery"
+                >
+
+                    <div class="feature-icon">
+                        🔋
+                    </div>
+
+                    <h3>
+                        Battery Saver
+                    </h3>
+
+                    <p>
+                        Reduce unnecessary website activity.
+                    </p>
+
+                    <span>
+                        Activate →
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="feature-card"
+                    data-feature="issues"
+                >
+
+                    <div class="feature-icon">
+                        📝
+                    </div>
+
+                    <h3>
+                        Customer Issues
+                    </h3>
+
+                    <p>
+                        Report technical or safety problems.
+                    </p>
+
+                    <span>
+                        Report →
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <div class="quick-tools">
+
+                <div class="section-heading">
+
+                    <span>
+                        QUICK ACTIONS
+                    </span>
+
+                    <h2>
+                        Emergency essentials
+                    </h2>
+
+                </div>
+
+
+                <div class="quick-grid">
+
+                    <button id="quickSiren">
+                        🔊
+                        <span>
+                            Siren
+                        </span>
+                    </button>
+
+                    <button id="quickStopSiren">
+                        🔇
+                        <span>
+                            Stop Siren
+                        </span>
+                    </button>
+
+                    <button id="flashButton">
+                        💡
+                        <span>
+                            Screen Flash
+                        </span>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             FEATURE MODAL / PAGES
+        ================================================== -->
+
+        <div
+            id="featureOverlay"
+            class="feature-overlay hidden"
+        >
+
+            <div class="feature-modal">
+
+
+                <!-- CLOSE -->
+
+                <button
+                    id="closeFeature"
+                    class="close-feature"
+                >
+                    ×
+                </button>
+
+
+                <!-- CONTACTS -->
+
+                <div
+                    id="contactsFeature"
+                    class="modal-content"
+                >
+
+                    <span class="eyebrow">
+                        TRUSTED SUPPORT
+                    </span>
+
+                    <h1>
+                        Trusted Contacts
+                    </h1>
+
+                    <p>
+                        Add at least five people you trust.
+                    </p>
+
+
+                    <div class="contacts-grid">
+
+                        <div class="contact-input">
+                            <label>Contact 1</label>
+                            <input id="contact1Name" placeholder="Name">
+                            <input
