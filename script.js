@@ -1,1411 +1,1328 @@
-/* =========================================================
-   SHE-SHIELD
-   Women Safety Emergency Platform
-   ========================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
+:root {
+    --cream: #f8eee8;
+    --cream-light: #fffaf6;
+    --gold: #b7893f;
+    --gold-light: #d7b06b;
+    --rose: #c98779;
+    --brown: #4b3026;
+    --brown-light: #6b4a3d;
+    --text: #33251f;
+    --line: rgba(111,75,56,.18);
+    --shadow: 0 18px 45px rgba(91,57,40,.10);
+}
 
-/* ================= GLOBAL ================= */
+* {
+    box-sizing: border-box;
+}
 
-const state = {
-    language: localStorage.getItem("sheShieldLanguage") || "en",
-    contacts: JSON.parse(
-        localStorage.getItem("sheShieldContacts") || "[]"
-    ),
-    batterySaver: false,
-    voiceListening: false,
-    shakeEnabled: false,
-    cameraStream: null,
-    mediaRecorder: null,
-    recordedChunks: [],
-    autoTimer: null,
-    countdown: 10
-};
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    color: var(--text);
+    font-family: Inter, Arial, sans-serif;
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            #fffdfb 0,
+            #f8eee8 55%,
+            #efe0d7 100%
+        );
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button,
+a {
+    cursor: pointer;
+}
+
+a {
+    text-decoration: none;
+}
+
+.hidden {
+    display: none !important;
+}
 
 
 /* ================= SPLASH ================= */
 
-window.addEventListener("load", () => {
+.splash {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
 
-    setTimeout(() => {
+    display: grid;
+    place-items: center;
 
-        document.getElementById("splashScreen")
-            .classList.add("hidden");
+    background: var(--cream);
+}
 
-        document.getElementById("languageScreen")
-            .classList.remove("hidden");
+.splash-content {
+    text-align: center;
+    animation: fadeIn .8s ease;
+}
 
-    }, 3000);
+.splash-logo {
+    width: 210px;
+    height: 210px;
+    object-fit: contain;
 
-});
+    filter:
+        drop-shadow(
+            0 15px 25px
+            rgba(89,54,33,.18)
+        );
+}
+
+.splash h1 {
+    margin: 12px 0 4px;
+
+    font-family:
+        "Cormorant Garamond",
+        serif;
+
+    font-size: 52px;
+    letter-spacing: 7px;
+
+    color: var(--brown);
+}
+
+.splash p {
+    color: var(--brown-light);
+    letter-spacing: 2px;
+}
+
+.loading-line {
+    width: 180px;
+    height: 3px;
+
+    margin: 24px auto;
+
+    background: #dfd0c7;
+
+    overflow: hidden;
+}
+
+.loading-line span {
+    display: block;
+
+    width: 45%;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--gold),
+            var(--rose)
+        );
+
+    animation: loading 1.5s infinite;
+}
 
 
 /* ================= LANGUAGE ================= */
 
-const languageButtons =
-    document.querySelectorAll(".languages button");
+.language-screen {
+    min-height: 100vh;
 
-let selectedLanguage = state.language;
+    display: grid;
+    place-items: center;
 
-languageButtons.forEach(button => {
+    padding: 25px;
 
-    if (button.dataset.lang === selectedLanguage) {
-        button.classList.add("selected");
-    }
+    background:
+        radial-gradient(
+            circle,
+            #fffdfb,
+            var(--cream)
+        );
+}
 
-    button.addEventListener("click", () => {
+.language-card {
+    width: min(480px,94vw);
 
-        languageButtons.forEach(btn =>
-            btn.classList.remove("selected")
+    padding: 35px;
+
+    text-align: center;
+
+    background:
+        rgba(255,255,255,.55);
+
+    border: 1px solid var(--line);
+
+    border-radius: 28px;
+
+    box-shadow: var(--shadow);
+
+    backdrop-filter: blur(12px);
+}
+
+.language-logo {
+    width: 105px;
+    height: 105px;
+    object-fit: contain;
+}
+
+.language-card h1 {
+    font-family:
+        "Cormorant Garamond",
+        serif;
+
+    font-size: 50px;
+
+    color: var(--brown);
+
+    margin: 12px 0;
+}
+
+.language-card p {
+    color: #705e55;
+}
+
+.language-list {
+    display: grid;
+    gap: 9px;
+    margin: 25px 0;
+}
+
+.language-btn {
+    padding: 14px 17px;
+
+    text-align: left;
+
+    border-radius: 14px;
+
+    border: 1px solid var(--line);
+
+    background:
+        rgba(255,255,255,.6);
+
+    color: var(--text);
+
+    transition: .2s;
+}
+
+.language-btn:hover,
+.language-btn.active {
+    border-color: var(--gold);
+
+    box-shadow:
+        0 5px 20px
+        rgba(183,137,63,.12);
+}
+
+
+/* ================= BUTTONS ================= */
+
+.gold-button,
+.danger-button,
+.soft-button {
+    border-radius: 13px;
+
+    padding: 13px 18px;
+
+    font-weight: 700;
+
+    transition: .2s;
+}
+
+.gold-button {
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #8e6030,
+            #c69b58,
+            #9a6c36
         );
 
-        button.classList.add("selected");
+    box-shadow:
+        0 8px 20px
+        rgba(129,83,37,.18);
+}
 
-        selectedLanguage = button.dataset.lang;
+.gold-button:hover {
+    transform: translateY(-1px);
+}
 
-    });
+.danger-button {
+    color: white;
 
-});
-
-
-document.getElementById("continueBtn")
-    .addEventListener("click", () => {
-
-        state.language = selectedLanguage;
-
-        localStorage.setItem(
-            "sheShieldLanguage",
-            selectedLanguage
+    background:
+        linear-gradient(
+            135deg,
+            #b93431,
+            #ed5a50
         );
 
-        document.getElementById("languageScreen")
-            .classList.add("hidden");
+    box-shadow:
+        0 9px 25px
+        rgba(180,48,45,.22);
+}
 
-        document.getElementById("app")
-            .classList.remove("hidden");
+.soft-button {
+    color: var(--brown);
 
-        speakReadyMessage();
+    background:
+        rgba(255,255,255,.65);
 
-    });
+    border: 1px solid var(--line);
+}
 
-
-/* ================= NAVIGATION ================= */
-
-function showPage(pageName) {
-
-    document.querySelectorAll(".page")
-        .forEach(page => page.classList.remove("active"));
-
-    const page = document.getElementById(pageName);
-
-    if (page) {
-        page.classList.add("active");
-    }
-
-    document.getElementById("menu")
-        .classList.remove("open");
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
+.wide {
+    width: 100%;
 }
 
 
-document.querySelectorAll("[data-page]")
-    .forEach(button => {
+/* ================= HEADER ================= */
 
-        button.addEventListener("click", () => {
+.header {
+    position: sticky;
+    top: 0;
 
-            showPage(button.dataset.page);
+    z-index: 50;
 
-        });
+    height: 78px;
 
-    });
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding:
+        10px
+        clamp(18px,5vw,70px);
+
+    background:
+        rgba(255,249,245,.88);
+
+    backdrop-filter: blur(18px);
+
+    border-bottom:
+        1px solid var(--line);
+}
+
+.brand {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    background: transparent;
+
+    color: var(--brown);
+
+    text-align: left;
+}
+
+.brand img {
+    width: 48px;
+    height: 48px;
+
+    object-fit: contain;
+}
+
+.brand span {
+    display: grid;
+}
+
+.brand strong {
+    font-family:
+        "Cormorant Garamond",
+        serif;
+
+    font-size: 25px;
+
+    letter-spacing: 2px;
+}
+
+.brand small {
+    font-size: 9px;
+    letter-spacing: 1px;
+}
+
+.header nav {
+    display: flex;
+    gap: 6px;
+}
+
+.header nav button {
+    padding: 10px 14px;
+
+    color: var(--brown-light);
+
+    background: transparent;
+
+    border-radius: 10px;
+}
+
+.header nav button:hover {
+    background: #eee0d6;
+}
+
+.header-right {
+    display: flex;
+
+    gap: 10px;
+
+    align-items: center;
+}
+
+#languageSelect {
+    padding: 9px 12px;
+
+    border-radius: 12px;
+
+    border: 1px solid var(--line);
+
+    background: #fff8f3;
+
+    color: var(--brown-light);
+}
+
+.menu-button {
+    padding: 10px 14px;
+
+    font-size: 20px;
+
+    border: 0;
+
+    border-radius: 10px;
+
+    background: transparent;
+}
+
+.menu-button:hover {
+    background: #eee0d6;
+}
 
 
-/* ================= MENU ================= */
+/* ================= SIDE MENU ================= */
 
-document.getElementById("menuBtn")
-    .addEventListener("click", () => {
+.side-menu {
+    position: fixed;
 
-        document.getElementById("menu")
-            .classList.toggle("open");
+    right: 22px;
+    top: 88px;
 
-    });
+    width: 250px;
+
+    padding: 10px;
+
+    z-index: 100;
+
+    display: none;
+
+    background:
+        rgba(255,250,247,.97);
+
+    border:
+        1px solid var(--line);
+
+    border-radius: 20px;
+
+    box-shadow: var(--shadow);
+}
+
+.side-menu.open {
+    display: grid;
+}
+
+.side-menu button {
+    padding: 13px;
+
+    text-align: left;
+
+    color: var(--brown);
+
+    background: transparent;
+
+    border-radius: 10px;
+}
+
+.side-menu button:hover {
+    background: #f2e5dc;
+}
 
 
-/* ================= LOCATION ================= */
+/* ================= MAIN ================= */
 
-function getLocation() {
+main {
+    max-width: 1250px;
 
-    return new Promise((resolve, reject) => {
+    margin: auto;
 
-        if (!navigator.geolocation) {
-            reject("Geolocation is not supported.");
-            return;
-        }
+    padding:
+        55px 25px 90px;
+}
 
-        navigator.geolocation.getCurrentPosition(
-            position => {
+.page {
+    display: none;
+}
 
-                resolve({
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude
-                });
+.page.active {
+    display: block;
+}
 
-            },
 
-            error => {
-                reject(error.message);
-            },
+/* ================= HERO ================= */
 
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-            }
+.hero {
+    min-height: 440px;
 
+    display: grid;
+
+    grid-template-columns:
+        1.05fr .95fr;
+
+    align-items: center;
+
+    gap: 40px;
+}
+
+.eyebrow {
+    font-size: 11px;
+
+    letter-spacing: 3px;
+
+    font-weight: 700;
+
+    color: var(--gold);
+
+    text-transform: uppercase;
+}
+
+.hero h1 {
+    margin: 15px 0 25px;
+
+    font-family:
+        "Cormorant Garamond",
+        serif;
+
+    font-size: 82px;
+
+    line-height: .86;
+
+    color: var(--brown);
+}
+
+.hero p {
+    max-width: 610px;
+
+    font-size: 17px;
+
+    line-height: 1.8;
+
+    color: #6f5b51;
+}
+
+.hero-image {
+    display: flex;
+    justify-content: center;
+}
+
+.hero-image img {
+    width: min(390px,75vw);
+
+    object-fit: contain;
+
+    filter:
+        drop-shadow(
+            0 25px 30px
+            rgba(94,59,38,.14)
         );
-
-    });
-
 }
 
 
-/* ================= SHARE LOCATION ================= */
+/* ================= HOME CARDS ================= */
 
-async function shareLocation() {
+.home-cards {
+    display: grid;
 
-    try {
+    grid-template-columns:
+        1fr 1fr;
 
-        const location = await getLocation();
+    gap: 25px;
+}
 
-        const mapURL =
-            `https://www.google.com/maps?q=${location.latitude},${location.longitude}`;
+.home-card {
+    padding: 30px;
 
-        const message =
-            `SHE-SHIELD Emergency Location:\n${mapURL}`;
+    border-radius: 25px;
 
-        if (navigator.share) {
+    background:
+        rgba(255,255,255,.48);
 
-            await navigator.share({
-                title: "SHE-SHIELD Emergency",
-                text: message
-            });
+    border:
+        1px solid var(--line);
 
-        } else {
+    box-shadow: var(--shadow);
+}
 
-            await navigator.clipboard.writeText(message);
+.emergency-card {
+    border-color:
+        rgba(180,52,48,.25);
+}
 
-            alert(
-                "Location link copied. Send it to your trusted contact."
-            );
+.card-icon {
+    font-size: 30px;
+}
 
-        }
+.home-card h2 {
+    font-family:
+        "Cormorant Garamond",
+        serif;
 
-        return true;
+    font-size: 33px;
 
-    } catch (error) {
+    margin: 12px 0;
+}
 
-        alert(
-            "Unable to get/share location. Please allow location permission."
-        );
+.home-card p {
+    color: #705e55;
 
-        return false;
-    }
+    min-height: 48px;
 
+    line-height: 1.6;
 }
 
 
-/* ================= SIREN ================= */
+/* ================= HEADINGS ================= */
 
-const siren = new Audio("siren.mp3");
+.page-heading {
+    text-align: center;
 
-siren.loop = true;
+    max-width: 800px;
 
-function startSiren() {
-    siren.currentTime = 0;
-    siren.play().catch(() => {});
+    margin:
+        10px auto 45px;
 }
 
-function stopSiren() {
-    siren.pause();
-    siren.currentTime = 0;
+.page-heading h1 {
+    margin: 12px 0;
+
+    font-family:
+        "Cormorant Garamond",
+        serif;
+
+    font-size: 66px;
+
+    color: var(--brown);
 }
 
-
-/* ================= FLASH ================= */
-
-function screenFlash() {
-
-    const flash = document.createElement("div");
-
-    flash.style.position = "fixed";
-    flash.style.inset = "0";
-    flash.style.background = "white";
-    flash.style.zIndex = "10000";
-    flash.style.opacity = "1";
-
-    document.body.appendChild(flash);
-
-    let count = 0;
-
-    const interval = setInterval(() => {
-
-        flash.style.opacity =
-            flash.style.opacity === "1" ? "0" : "1";
-
-        count++;
-
-        if (count >= 8) {
-
-            clearInterval(interval);
-            flash.remove();
-
-        }
-
-    }, 180);
-
+.page-heading p {
+    color: #705e55;
 }
 
 
-/* ================= MAIN SOS ================= */
+/* ================= TOOL GRID ================= */
 
-async function triggerSOS(options = {}) {
+.tool-grid {
+    display: grid;
 
-    const {
-        sirenOn = true,
-        flashOn = false,
-        locationOn = true
-    } = options;
+    grid-template-columns:
+        repeat(3,1fr);
 
-    const status =
-        document.getElementById("sosStatus");
+    gap: 18px;
+}
 
-    if (status) {
-        status.textContent = "SOS ACTIVATED";
-        status.style.color = "#c7191e";
-    }
+.tool-card {
+    min-height: 155px;
 
-    if (sirenOn) {
-        startSiren();
-    }
+    padding: 24px;
 
-    if (flashOn) {
-        screenFlash();
-    }
+    text-align: left;
 
-    if (locationOn) {
-        await shareLocation();
-    }
+    display: flex;
 
-    addIncident("SOS activated");
+    flex-direction: column;
 
+    align-items: flex-start;
+
+    border-radius: 20px;
+
+    background:
+        rgba(255,255,255,.48);
+
+    border:
+        1px solid var(--line);
+
+    box-shadow: var(--shadow);
+
+    color: var(--text);
+
+    transition: .2s;
+}
+
+.tool-card:hover {
+    transform: translateY(-3px);
+
+    border-color:
+        rgba(183,137,63,.45);
+}
+
+.tool-card span {
+    font-size: 25px;
+
+    margin-bottom: 16px;
+}
+
+.tool-card strong {
+    color: var(--brown);
+
+    font-size: 17px;
+}
+
+.tool-card small {
+    margin-top: 7px;
+
+    color: #7b6860;
+
+    line-height: 1.5;
+}
+
+.quick-actions {
+    display: flex;
+
+    gap: 12px;
+
+    margin-top: 22px;
+}
+
+.quick-actions button,
+.quick-actions a {
+    padding: 13px 18px;
+
+    border-radius: 13px;
+
+    font-weight: 700;
+}
+
+.quick-actions button {
+    background: white;
+
+    color: var(--brown);
+
+    border: 1px solid var(--line);
+}
+
+.quick-actions a {
+    color: white;
+
+    background: var(--brown);
 }
 
 
-/* ================= SOS BUTTON ================= */
+/* ================= PANELS ================= */
 
-const sosButton =
-    document.getElementById("sosButton");
+.panel {
+    max-width: 900px;
 
-let pressTimer = null;
+    margin: auto;
 
-sosButton.addEventListener("pointerdown", () => {
+    padding: 30px;
 
-    sosButton.style.transform = "scale(.95)";
+    border-radius: 25px;
 
-    pressTimer = setTimeout(() => {
+    background:
+        rgba(255,255,255,.48);
 
-        triggerSOS({
-            sirenOn: true,
-            flashOn: true,
-            locationOn: true
-        });
+    border:
+        1px solid var(--line);
 
-    }, 1500);
-
-});
-
-
-["pointerup", "pointerleave"].forEach(event => {
-
-    sosButton.addEventListener(event, () => {
-
-        clearTimeout(pressTimer);
-
-        sosButton.style.transform = "scale(1)";
-
-    });
-
-});
-
-
-/* ================= EMERGENCY LOCATION ================= */
-
-document.getElementById("emergencyLocation")
-    .addEventListener("click", shareLocation);
-
-
-/* ================= SILENT SOS ================= */
-
-document.getElementById("silentSOS")
-    .addEventListener("click", async () => {
-
-        await triggerSOS({
-            sirenOn: false,
-            flashOn: false,
-            locationOn: true
-        });
-
-        alert(
-            "Silent SOS activated. Location sharing initiated."
-        );
-
-    });
-
-
-/* ================= VOICE SOS ================= */
-
-let recognition = null;
-
-function startVoiceSOS() {
-
-    const SpeechRecognition =
-        window.SpeechRecognition ||
-        window.webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-
-        alert(
-            "Voice recognition is not supported in this browser."
-        );
-
-        return;
-
-    }
-
-    recognition = new SpeechRecognition();
-
-    recognition.continuous = true;
-    recognition.interimResults = false;
-
-    const languageMap = {
-        en: "en-IN",
-        kn: "kn-IN",
-        te: "te-IN",
-        ta: "ta-IN",
-        hi: "hi-IN"
-    };
-
-    recognition.lang =
-        languageMap[state.language] || "en-IN";
-
-
-    recognition.onresult = event => {
-
-        const last =
-            event.results[event.results.length - 1][0]
-                .transcript
-                .toLowerCase()
-                .trim();
-
-        console.log("Voice:", last);
-
-        if (
-            last.includes("phone") ||
-            last.includes("फोन") ||
-            last.includes("ಫೋನ್") ||
-            last.includes("ఫోన్") ||
-            last.includes("போன்")
-        ) {
-
-            triggerSOS({
-                sirenOn: true,
-                flashOn: true,
-                locationOn: true
-            });
-
-        }
-
-    };
-
-
-    recognition.onerror = error => {
-        console.log("Voice recognition:", error);
-    };
-
-
-    recognition.onend = () => {
-
-        if (state.voiceListening) {
-
-            try {
-                recognition.start();
-            } catch(e) {}
-
-        }
-
-    };
-
-
-    state.voiceListening = true;
-
-    recognition.start();
-
-    alert(
-        'Voice SOS activated.\nSay "PHONE" to trigger SOS.'
-    );
-
+    box-shadow: var(--shadow);
 }
 
+#contactFields {
+    display: grid;
 
-function stopVoiceSOS() {
+    gap: 13px;
 
-    state.voiceListening = false;
-
-    if (recognition) {
-
-        recognition.stop();
-        recognition = null;
-
-    }
-
+    margin-bottom: 18px;
 }
 
+.contact-row {
+    display: grid;
 
-document.getElementById("voiceSOS")
-    .addEventListener("click", () => {
+    grid-template-columns:
+        1fr 1fr;
 
-        if (state.voiceListening) {
-
-            stopVoiceSOS();
-
-            alert("Voice SOS stopped.");
-
-        } else {
-
-            startVoiceSOS();
-
-        }
-
-    });
-
-
-/* ================= SHAKE SOS ================= */
-
-let lastX = null;
-let lastY = null;
-let lastZ = null;
-
-function enableShakeSOS() {
-
-    if (state.shakeEnabled) {
-
-        state.shakeEnabled = false;
-
-        alert("Shake SOS disabled.");
-
-        return;
-
-    }
-
-
-    const startShake = () => {
-
-        state.shakeEnabled = true;
-
-        window.addEventListener(
-            "devicemotion",
-            detectShake
-        );
-
-        alert(
-            "Shake SOS enabled.\nShake your phone strongly to activate SOS."
-        );
-
-    };
-
-
-    if (
-        typeof DeviceMotionEvent !== "undefined" &&
-        typeof DeviceMotionEvent.requestPermission === "function"
-    ) {
-
-        DeviceMotionEvent.requestPermission()
-            .then(permission => {
-
-                if (permission === "granted") {
-                    startShake();
-                } else {
-                    alert("Motion permission denied.");
-                }
-
-            })
-            .catch(() => {
-                alert("Motion permission is required.");
-            });
-
-    } else {
-
-        startShake();
-
-    }
-
+    gap: 13px;
 }
 
+.panel input,
+.panel select,
+.panel textarea {
+    width: 100%;
 
-function detectShake(event) {
+    padding: 14px;
 
-    if (!state.shakeEnabled) return;
+    border:
+        1px solid var(--line);
 
-    const acceleration = event.accelerationIncludingGravity;
+    border-radius: 12px;
 
-    if (!acceleration) return;
+    background:
+        rgba(255,255,255,.65);
 
-    const x = acceleration.x || 0;
-    const y = acceleration.y || 0;
-    const z = acceleration.z || 0;
+    color: var(--text);
 
-    if (lastX !== null) {
-
-        const delta =
-            Math.abs(x - lastX) +
-            Math.abs(y - lastY) +
-            Math.abs(z - lastZ);
-
-        if (delta > 35) {
-
-            state.shakeEnabled = false;
-
-            window.removeEventListener(
-                "devicemotion",
-                detectShake
-            );
-
-            triggerSOS({
-                sirenOn: true,
-                flashOn: false,
-                locationOn: true
-            });
-
-        }
-
-    }
-
-    lastX = x;
-    lastY = y;
-    lastZ = z;
-
+    outline: none;
 }
 
+.panel textarea {
+    min-height: 150px;
 
-document.getElementById("shakeSOS")
-    .addEventListener("click", enableShakeSOS);
-
-
-/* ================= AUTO SOS ================= */
-
-const autoModal =
-    document.getElementById("autoModal");
-
-const countdown =
-    document.getElementById("countdown");
-
-
-document.getElementById("autoSOS")
-    .addEventListener("click", startAutoSOS);
-
-
-function startAutoSOS() {
-
-    clearInterval(state.autoTimer);
-
-    state.countdown = 10;
-
-    countdown.textContent = state.countdown;
-
-    autoModal.classList.remove("hidden");
-
-    state.autoTimer = setInterval(() => {
-
-        state.countdown--;
-
-        countdown.textContent =
-            state.countdown;
-
-        if (state.countdown <= 0) {
-
-            clearInterval(state.autoTimer);
-
-            autoModal.classList.add("hidden");
-
-            triggerSOS({
-                sirenOn: true,
-                flashOn: false,
-                locationOn: true
-            });
-
-        }
-
-    }, 1000);
-
+    resize: vertical;
 }
 
+#contactStatus,
+#issueStatus {
+    min-height: 20px;
 
-document.getElementById("stopAuto")
-    .addEventListener("click", () => {
+    color: var(--gold);
 
-        clearInterval(state.autoTimer);
-
-        autoModal.classList.add("hidden");
-
-        alert("Auto SOS stopped.");
-
-    });
-
-
-/* ================= CONTACTS ================= */
-
-const contactInputs =
-    document.getElementById("contactInputs");
-
-
-function createContactInputs() {
-
-    contactInputs.innerHTML = "";
-
-    for (let i = 0; i < 5; i++) {
-
-        const saved =
-            state.contacts[i] || {
-                name: "",
-                phone: ""
-            };
-
-        const row =
-            document.createElement("div");
-
-        row.className = "contact-row";
-
-        row.innerHTML = `
-
-            <input
-                type="text"
-                placeholder="Contact ${i + 1} Name"
-                value="${saved.name || ""}"
-                data-name="${i}"
-            >
-
-            <input
-                type="tel"
-                placeholder="Contact ${i + 1} Phone"
-                value="${saved.phone || ""}"
-                data-phone="${i}"
-            >
-
-        `;
-
-        contactInputs.appendChild(row);
-
-    }
-
+    font-weight: 600;
 }
-
-createContactInputs();
-
-
-document.getElementById("saveContacts")
-    .addEventListener("click", () => {
-
-        const contacts = [];
-
-        for (let i = 0; i < 5; i++) {
-
-            const name =
-                document.querySelector(
-                    `[data-name="${i}"]`
-                ).value.trim();
-
-            const phone =
-                document.querySelector(
-                    `[data-phone="${i}"]`
-                ).value.trim();
-
-            if (!name || !phone) {
-
-                document.getElementById(
-                    "contactStatus"
-                ).textContent =
-                    `Please complete Contact ${i + 1}.`;
-
-                return;
-
-            }
-
-            contacts.push({
-                name,
-                phone
-            });
-
-        }
-
-        state.contacts = contacts;
-
-        localStorage.setItem(
-            "sheShieldContacts",
-            JSON.stringify(contacts)
-        );
-
-        document.getElementById(
-            "contactStatus"
-        ).textContent =
-            "✓ Five trusted contacts saved successfully.";
-
-    });
 
 
 /* ================= EVIDENCE ================= */
 
-const cameraPreview =
-    document.getElementById("cameraPreview");
+.camera-box {
+    min-height: 250px;
 
+    display: grid;
 
-document.getElementById("cameraBtn")
-    .addEventListener("click", async () => {
+    place-items: center;
 
-        try {
+    overflow: hidden;
 
-            state.cameraStream =
-                await navigator.mediaDevices.getUserMedia({
-                    video: true,
-                    audio: true
-                });
+    background: #2c201c;
 
-            cameraPreview.srcObject =
-                state.cameraStream;
+    border-radius: 18px;
+}
 
-            cameraPreview.classList.remove("hidden");
+.camera-box video {
+    width: 100%;
 
-        } catch (error) {
+    max-height: 500px;
 
-            alert(
-                "Camera and microphone permission is required."
-            );
+    object-fit: cover;
+}
 
-        }
+.evidence-buttons {
+    display: flex;
 
-    });
+    flex-wrap: wrap;
 
+    gap: 10px;
 
-/* ================= PHOTO ================= */
+    margin: 16px 0;
+}
 
-document.getElementById("photoBtn")
-    .addEventListener("click", () => {
+#evidenceFiles {
+    display: grid;
 
-        if (!state.cameraStream) {
+    gap: 8px;
 
-            alert("Open camera first.");
-            return;
+    margin-top: 15px;
+}
 
-        }
+#evidenceFiles div {
+    padding: 10px;
 
-        const canvas =
-            document.createElement("canvas");
+    border: 1px solid var(--line);
 
-        canvas.width =
-            cameraPreview.videoWidth;
+    border-radius: 10px;
 
-        canvas.height =
-            cameraPreview.videoHeight;
-
-        const ctx =
-            canvas.getContext("2d");
-
-        ctx.drawImage(
-            cameraPreview,
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-
-        const image =
-            document.createElement("img");
-
-        image.src =
-            canvas.toDataURL("image/png");
-
-        image.className =
-            "camera-preview";
-
-        document.getElementById(
-            "evidencePreview"
-        ).prepend(image);
-
-    });
-
-
-/* ================= VIDEO ================= */
-
-document.getElementById("videoBtn")
-    .addEventListener("click", () => {
-
-        if (!state.cameraStream) {
-
-            alert("Open camera first.");
-            return;
-
-        }
-
-        state.recordedChunks = [];
-
-        state.mediaRecorder =
-            new MediaRecorder(
-                state.cameraStream
-            );
-
-        state.mediaRecorder.ondataavailable =
-            event => {
-
-                if (event.data.size > 0) {
-
-                    state.recordedChunks.push(
-                        event.data
-                    );
-
-                }
-
-            };
-
-
-        state.mediaRecorder.onstop = () => {
-
-            const blob =
-                new Blob(
-                    state.recordedChunks,
-                    { type: "video/webm" }
-                );
-
-            const url =
-                URL.createObjectURL(blob);
-
-            const video =
-                document.createElement("video");
-
-            video.src = url;
-            video.controls = true;
-            video.className = "camera-preview";
-
-            document.getElementById(
-                "evidencePreview"
-            ).prepend(video);
-
-        };
-
-
-        state.mediaRecorder.start();
-
-        alert("Video recording started.");
-
-    });
-
-
-document.getElementById("stopVideoBtn")
-    .addEventListener("click", () => {
-
-        if (
-            state.mediaRecorder &&
-            state.mediaRecorder.state !== "inactive"
-        ) {
-
-            state.mediaRecorder.stop();
-
-            alert("Video recording stopped.");
-
-        }
-
-    });
-
-
-/* ================= AUDIO ================= */
-
-let audioRecorder = null;
-let audioChunks = [];
-
-
-document.getElementById("audioBtn")
-    .addEventListener("click", async () => {
-
-        try {
-
-            const stream =
-                await navigator.mediaDevices
-                    .getUserMedia({
-                        audio: true
-                    });
-
-            audioChunks = [];
-
-            audioRecorder =
-                new MediaRecorder(stream);
-
-            audioRecorder.ondataavailable =
-                event => {
-
-                    audioChunks.push(event.data);
-
-                };
-
-
-            audioRecorder.onstop = () => {
-
-                const blob =
-                    new Blob(
-                        audioChunks,
-                        { type: "audio/webm" }
-                    );
-
-                const url =
-                    URL.createObjectURL(blob);
-
-                const audio =
-                    document.createElement("audio");
-
-                audio.controls = true;
-                audio.src = url;
-
-                document.getElementById(
-                    "evidencePreview"
-                ).prepend(audio);
-
-                stream.getTracks().forEach(
-                    track => track.stop()
-                );
-
-            };
-
-
-            audioRecorder.start();
-
-            alert("Audio recording started.");
-
-        } catch (error) {
-
-            alert(
-                "Microphone permission is required."
-            );
-
-        }
-
-    });
-
-
-document.getElementById("stopAudioBtn")
-    .addEventListener("click", () => {
-
-        if (
-            audioRecorder &&
-            audioRecorder.state !== "inactive"
-        ) {
-
-            audioRecorder.stop();
-
-        }
-
-    });
-
-
-/* ================= FILE UPLOAD ================= */
-
-document.getElementById("fileUpload")
-    .addEventListener("change", event => {
-
-        const files = event.target.files;
-
-        const container =
-            document.getElementById(
-                "evidencePreview"
-            );
-
-        Array.from(files).forEach(file => {
-
-            const item =
-                document.createElement("div");
-
-            item.className =
-                "evidence-item";
-
-            item.innerHTML = `
-                <strong>${file.name}</strong>
-                <br>
-                <small>
-                    ${(file.size / 1024).toFixed(1)} KB
-                </small>
-            `;
-
-            container.prepend(item);
-
-        });
-
-    });
-
-
-/* ================= FAKE CALL ================= */
-
-const fakeCallScreen =
-    document.getElementById("fakeCallScreen");
-
-
-const fatherScripts = {
-
-    en: [
-        "Hello? Where are you?",
-        "Why haven't you told me where you are?",
-        "Listen carefully and stay somewhere safe.",
-        "Don't walk around alone if something feels wrong.",
-        "Call me back immediately when you are safe.",
-        "Keep your phone with you.",
-        "I need you to be careful, understood?",
-        "Do not ignore my calls.",
-        "Get to a safe place first.",
-        "Then call me."
-    ],
-
-    kn: [
-        "ಹಲೋ? ನೀನು ಎಲ್ಲಿದ್ದೀಯ?",
-        "ನೀನು ಎಲ್ಲಿದ್ದೀಯ ಅಂತ ನನಗೆ ಏಕೆ ಹೇಳಲಿಲ್ಲ?",
-        "ಜಾಗ್ರತೆಯಿಂದ ಕೇಳು ಮತ್ತು ಸುರಕ್ಷಿತ ಸ್ಥಳದಲ್ಲಿರು.",
-        "ಏನಾದರೂ ತಪ್ಪಾಗಿದೆ ಅನ್ನಿಸಿದರೆ ಒಬ್ಬಳೇ ಹೋಗಬೇಡ.",
-        "ಸುರಕ್ಷಿತವಾದ ತಕ್ಷಣ ನನಗೆ ಕರೆ ಮಾಡು.",
-        "ಫೋನ್ ನಿನ್ನ ಹತ್ತಿರ ಇಟ್ಟುಕೋ.",
-        "ಜಾಗ್ರತೆಯಿಂದ ಇರಬೇಕು, ಅರ್ಥ ಆಯ್ತಾ?",
-        "ನನ್ನ ಕರೆಗಳನ್ನು ನಿರ್ಲಕ್ಷಿಸಬೇಡ.",
-        "ಮೊದಲು ಸುರಕ್ಷಿತ ಸ್ಥಳಕ್ಕೆ ಹೋಗು.",
-        "ಆಮೇಲೆ ನನಗೆ ಕರೆ ಮಾಡು."
-    ],
-
-    te: [
-        "హలో? నువ్వు ఎక్కడ ఉన్నావు?",
-        "నువ్వు ఎక్కడ ఉన్నావో నాకు ఎందుకు చెప్పలేదు?",
-        "జాగ్రత్తగా విను, సురక్షితమైన చోటు ఉండి.",
-        "ఏదైనా తప్పుగా అనిపిస్తే ఒంటరిగా వెళ్లకు.",
-        "సురక్షితంగా ఉన్న వెంటనే నాకు కాల్ చేయి.",
-        "ఫోన్ నీ దగ్గర ఉంచుకో.",
-        "జాగ్రత్తగా ఉండాలి, అర్థమైందా?",
-        "నా కాల్స్‌ను పట్టించుకోకుండా ఉండకు.",
-        "ముందుగా సురక్షితమైన చోటుకి వెళ్లు.",
-        "తర్వాత నాకు కాల్ చేయి."
-    ],
-
-    ta: [
-        "ஹலோ? நீ எங்கே இருக்கிறாய்?",
-        "நீ எங்கே இருக்கிறாய் என்று ஏன் சொல்லவில்லை?",
-        "கவனமாக கேள், பாதுகாப்பான இடத்தில் இரு.",
-        "ஏதாவது தவறாக இருந்தால் தனியாக செல்லாதே.",
-        "பாதுகாப்பாக இருந்தவுடன் எனக்கு அழைப்பு செய்.",
-        "தொலைபேசியை உன்னிடம் வைத்துக்கொள்.",
-        "கவனமாக இருக்க வேண்டும், புரிகிறதா?",
-        "என் அழைப்புகளை புறக்கணிக்காதே.",
-        "முதலில் பாதுகாப்பான இடத்துக்குச் செல்.",
-        "பிறகு எனக்கு அழைப்பு செய்."
-    ],
-
-    hi: [
-        "हैलो? तुम कहाँ हो?",
-        "तुम कहाँ हो यह मुझे क्यों नहीं बताया?",
-        "ध्यान से सुनो और सुरक्षित जगह पर रहो.",
-        "अगर कुछ गलत लगे तो अकेले मत जाना.",
-        "सुरक्षित होते ही मुझे फोन करना.",
-        "फोन अपने पास रखना.",
-        "सावधान रहना, समझी?",
-        "मेरी कॉल को नजरअंदाज मत करना.",
-        "पहले सुरक्षित जगह पर जाओ.",
-        "फिर मुझे फोन करना."
-    ]
-
-};
-
-
-function fakeCall() {
-
-    fakeCallScreen.classList.remove("hidden");
-
-    const messages =
-        fatherScripts[state.language] ||
-        fatherScripts.en;
-
-    speakFather(messages, 0);
-
+    background: #fff8f4;
 }
 
 
-function speakFather(messages, index) {
+/* ================= TIPS ================= */
 
-    if (
-        index >= messages.length ||
-        fakeCallScreen.classList.contains("hidden")
-    ) {
-        return;
+.tips-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap: 18px;
+}
+
+.tips-grid div {
+    padding: 25px;
+
+    border-radius: 20px;
+
+    background:
+        rgba(255,255,255,.48);
+
+    border:
+        1px solid var(--line);
+
+    box-shadow: var(--shadow);
+}
+
+.tips-grid b {
+    color: var(--gold);
+
+    font-size: 12px;
+
+    letter-spacing: 2px;
+}
+
+.tips-grid h3 {
+    color: var(--brown);
+}
+
+.tips-grid p {
+    color: #75635b;
+
+    line-height: 1.6;
+}
+
+
+/* ================= HELPLINES ================= */
+
+.helpline-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap: 18px;
+}
+
+.helpline-grid a {
+    padding: 25px;
+
+    display: grid;
+
+    gap: 7px;
+
+    border-radius: 20px;
+
+    background:
+        rgba(255,255,255,.48);
+
+    border:
+        1px solid var(--line);
+
+    box-shadow: var(--shadow);
+}
+
+.helpline-grid a:first-letter {
+    font-size: 28px;
+}
+
+.helpline-grid strong {
+    color: var(--brown);
+
+    font-size: 18px;
+}
+
+.helpline-grid span {
+    font-size: 25px;
+
+    color: var(--gold);
+
+    font-weight: 800;
+}
+
+
+/* ================= BATTERY ================= */
+
+.battery-panel {
+    text-align: center;
+}
+
+.battery-icon {
+    font-size: 60px;
+}
+
+.battery-meter {
+    height: 12px;
+
+    margin: 25px 0;
+
+    overflow: hidden;
+
+    border-radius: 20px;
+
+    background: #eadbd1;
+}
+
+.battery-meter span {
+    display: block;
+
+    width: 0;
+
+    height: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #7d9d59,
+            #d5b35f
+        );
+
+    transition: width .5s;
+}
+
+.battery-on * {
+    animation: none !important;
+    transition: none !important;
+}
+
+
+/* ================= FORM ================= */
+
+#issueForm {
+    display: grid;
+
+    gap: 13px;
+}
+
+
+/* ================= MODALS ================= */
+
+.modal {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 300;
+
+    display: grid;
+
+    place-items: center;
+
+    padding: 20px;
+
+    background:
+        rgba(45,28,22,.68);
+
+    backdrop-filter: blur(8px);
+}
+
+.modal-box,
+.fake-phone {
+    width: min(440px,95vw);
+
+    padding: 35px;
+
+    text-align: center;
+
+    border-radius: 28px;
+
+    background: var(--cream-light);
+
+    box-shadow:
+        0 30px 80px
+        rgba(0,0,0,.3);
+}
+
+.countdown {
+    font-size: 100px;
+
+    font-weight: 800;
+
+    color: #c53e39;
+
+    line-height: 1;
+}
+
+.fake-phone {
+    position: relative;
+
+    background:
+        linear-gradient(
+            160deg,
+            #fff9f4,
+            #ead8cf
+        );
+}
+
+.fake-logo {
+    width: 90px;
+    height: 90px;
+
+    object-fit: contain;
+}
+
+.fake-phone small {
+    letter-spacing: 3px;
+
+    color: #8a7369;
+}
+
+.fake-phone h2 {
+    font-family:
+        "Cormorant Garamond",
+        serif;
+
+    font-size: 42px;
+
+    margin: 8px;
+}
+
+.call-buttons {
+    display: flex;
+
+    justify-content: center;
+
+    gap: 25px;
+
+    margin-top: 25px;
+}
+
+.call-buttons button {
+    width: 62px;
+    height: 62px;
+
+    border-radius: 50%;
+
+    border: 0;
+
+    font-size: 25px;
+
+    color: white;
+
+    background: #5c4033;
+}
+
+.call-buttons button:last-child {
+    background: #b83b38;
+}
+
+.close-button {
+    position: absolute;
+
+    right: 18px;
+    top: 12px;
+
+    border: 0;
+
+    background: transparent;
+
+    font-size: 30px;
+
+    color: var(--brown);
+}
+
+
+/* ================= EMERGENCY ================= */
+
+.emergency-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 400;
+
+    display: grid;
+
+    place-items: center;
+
+    text-align: center;
+
+    color: white;
+
+    background:
+        rgba(90,15,13,.92);
+}
+
+.big-sos {
+    width: 170px;
+    height: 170px;
+
+    margin: auto;
+
+    display: grid;
+
+    place-items: center;
+
+    border-radius: 50%;
+
+    background: #e73c37;
+
+    border:
+        8px solid
+        rgba(255,255,255,.45);
+
+    font-size: 55px;
+
+    font-weight: 900;
+
+    box-shadow:
+        0 0 60px
+        rgba(255,80,60,.55);
+}
+
+
+/* ================= TOAST ================= */
+
+.toast {
+    position: fixed;
+
+    left: 50%;
+
+    bottom: 25px;
+
+    z-index: 500;
+
+    max-width: 90vw;
+
+    padding: 13px 20px;
+
+    color: white;
+
+    text-align: center;
+
+    background: var(--brown);
+
+    border-radius: 12px;
+
+    transform:
+        translate(-50%,120px);
+
+    transition: .3s;
+}
+
+.toast.show {
+    transform:
+        translate(-50%,0);
+}
+
+
+/* ================= ANIMATION ================= */
+
+@keyframes fadeIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(10px);
     }
 
-    const utterance =
-        new SpeechSynthesisUtterance(
-            messages[index]
-        );
-
-    const voiceLanguages = {
-        en: "en-IN",
-        kn: "kn-IN",
-        te: "te-IN",
-        ta: "ta-IN",
-        hi: "hi-IN"
-    };
-
-    utterance.lang =
-        voiceLanguages[state.language] || "en-IN";
-
-    utterance.rate = .86;
-    utterance.pitch = .72;
-    utterance.volume = 1;
-
-    utterance.onend = () => {
-
-        setTimeout(() => {
-
-            speakFather(
-                messages,
-                index + 1
-            );
-
-        }, 700);
-
-    };
-
-    speechSynthesis.speak(utterance);
-
-}
-
-
-document.getElementById("fakeCall")
-    .addEventListener("click", fakeCall);
-
-
-document.getElementById("declineCall")
-    .addEventListener("click", () => {
-
-        speechSynthesis.cancel();
-
-        fakeCallScreen.classList.add("hidden");
-
-    });
-
-
-document.getElementById("answerCall")
-    .addEventListener("click", () => {
-
-        speechSynthesis.cancel();
-
-        const messages =
-            fatherScripts[state.language] ||
-            fatherScripts.en;
-
-        speakFather(messages, 0);
-
-    });
-
-
-/* ================= BATTERY SAVER ================= */
-
-document.getElementById("batterySaverBtn")
-    .addEventListener("click", () => {
-
-        state.batterySaver =
-            !state.batterySaver;
-
-        document.body.classList.toggle(
-            "battery-mode",
-            state.batterySaver
-        );
-
-        const stateText =
-            document.getElementById(
-                "batteryState"
-            );
-
-        const button =
-            document.getElementById(
-                "batterySaverBtn"
-            );
-
-        if (state.batterySaver) {
-
-            stateText.textContent =
-                "Battery Saver is ON";
-
-            button.textContent =
-                "Turn Off Battery Saver";
-
-            alert(
-                "Battery Saver activated.\nAnimations and unnecessary visual activity have been reduced."
-            );
-
-        } else {
-
-            stateText.textContent =
-                "Battery Saver is OFF";
-
-            button.textContent =
-                "Activate Battery Saver";
-
-        }
-
-    });
-
-
-/* ================= CUSTOMER ISSUES ================= */
-
-document.getElementById("submitIssue")
-    .addEventListener("click", () => {
-
-        const name =
-            document.getElementById(
-                "issueName"
-            ).value.trim();
-
-        const email =
-            document.getElementById(
-                "issueEmail"
-            ).value.trim();
-
-        const type =
-            document.getElementById(
-                "issueType"
-            ).value;
-
-        const text =
-            document.getElementById(
-                "issueText"
-            ).value.trim();
-
-        if (!name || !email || !text) {
-
-            document.getElementById(
-                "issueStatus"
-            ).textContent =
-                "Please complete all fields.";
-
-            return;
-
-        }
-
-        const issue = {
-            name,
-            email,
-            type,
-            text,
-            date: new Date().toLocaleString()
-        };
-
-        const issues =
-            JSON.parse(
-                localStorage.getItem(
-                    "sheShieldIssues"
-                ) || "[]"
-            );
-
-        issues.push(issue);
-
-        localStorage.setItem(
-            "sheShieldIssues",
-            JSON.stringify(issues)
-        );
-
-        document.getElementById(
-            "issueStatus"
-        ).textContent =
-            "✓ Your issue has been saved.";
-
-        document.getElementById(
-            "issueName"
-        ).value = "";
-
-        document.getElementById(
-            "issueEmail"
-        ).value = "";
-
-        document.getElementById(
-            "issueText"
-        ).value = "";
-
-    });
-
-
-/* ================= LANGUAGE SELECT ================= */
-
-document.getElementById("languageSelect")
-    .addEventListener("change", event => {
-
-        state.language =
-            event.target.value;
-
-        localStorage.setItem(
-            "sheShieldLanguage",
-            state.language
-        );
-
-    });
-
-
-/* ================= INCIDENTS ================= */
-
-function addIncident(message) {
-
-    const incidents =
-        JSON.parse(
-            localStorage.getItem(
-                "sheShieldIncidents"
-            ) || "[]"
-        );
-
-    incidents.unshift({
-        message,
-        time: new Date().toLocaleString()
-    });
-
-    localStorage.setItem(
-        "sheShieldIncidents",
-        JSON.stringify(incidents)
-    );
-
-}
-
-
-/* ================= VOICE READY ================= */
-
-function speakReadyMessage() {
-
-    console.log(
-        "SHE-SHIELD ready in language:",
-        state.language
-    );
-
-}
-
-
-/* ================= CLEANUP ================= */
-
-window.addEventListener("beforeunload", () => {
-
-    stopSiren();
-    stopVoiceSOS();
-
-    if (state.cameraStream) {
-
-        state.cameraStream
-            .getTracks()
-            .forEach(track => track.stop());
-
+    to {
+        opacity: 1;
+        transform: none;
     }
 
-});
+}
+
+@keyframes loading {
+
+    from {
+        transform: translateX(-120%);
+    }
+
+    to {
+        transform: translateX(420%);
+    }
+
+}
+
+
+/* ================= MOBILE ================= */
+
+@media(max-width:850px) {
+
+    .header nav {
+        display: none;
+    }
+
+    .hero {
+        grid-template-columns: 1fr;
+
+        text-align: center;
+    }
+
+    .hero-image {
+        order: -1;
+    }
+
+    .hero-image img {
+        width: 270px;
+    }
+
+    .hero h1 {
+        font-size: 60px;
+    }
+
+    .home-cards,
+    .tool-grid,
+    .tips-grid,
+    .helpline-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .page-heading h1 {
+        font-size: 50px;
+    }
+
+    .contact-row {
+        grid-template-columns: 1fr;
+    }
+
+    .quick-actions {
+        flex-direction: column;
+    }
+
+}
+
+
+@media(max-width:520px) {
+
+    main {
+        padding: 35px 15px 70px;
+    }
+
+    .header {
+        padding: 8px 12px;
+    }
+
+    .brand strong {
+        font-size: 21px;
+    }
+
+    .brand small {
+        font-size: 8px;
+    }
+
+    .brand img {
+        width: 42px;
+        height: 42px;
+    }
+
+    .splash-logo {
+        width: 175px;
+        height: 175px;
+    }
+
+    .splash h1 {
+        font-size: 38px;
+    }
+
+    .hero h1 {
+        font-size: 50px;
+    }
+
+    .page-heading h1 {
+        font-size: 44px;
+    }
+
+}
