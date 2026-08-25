@@ -3,30 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#f5e8df">
 
-    <title>SHE-SHIELD | Your Safety, Our Priority</title>
+    <title>SHE-SHIELD | Your Safety. Our Priority.</title>
 
-    <link rel="icon" type="image/png" href="she-shield-logo.png">
+    <link rel="icon" href="she-shield-logo.png">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- ================= SPLASH ================= -->
+<!-- ================= SPLASH SCREEN ================= -->
 
-<div id="splashScreen" class="splash">
+<div id="splash" class="splash">
     <div class="splash-content">
 
         <img src="she-shield-logo.png"
              class="splash-logo"
-             alt="SHE-SHIELD">
+             alt="SHE-SHIELD Logo">
 
         <h1>SHE-SHIELD</h1>
 
         <p>Your Safety. Our Priority.</p>
 
-        <div class="loading">
+        <div class="loading-line">
             <span></span>
         </div>
 
@@ -34,9 +33,9 @@
 </div>
 
 
-<!-- ================= LANGUAGE ================= -->
+<!-- ================= LANGUAGE SCREEN ================= -->
 
-<div id="languageScreen" class="screen hidden">
+<div id="languageScreen" class="language-screen hidden">
 
     <div class="language-card">
 
@@ -48,17 +47,31 @@
 
         <p>Select your preferred language</p>
 
-        <div class="languages">
+        <div class="language-list">
 
-            <button data-lang="en">🇬🇧 English</button>
-            <button data-lang="kn">🇮🇳 ಕನ್ನಡ</button>
-            <button data-lang="te">🇮🇳 తెలుగు</button>
-            <button data-lang="ta">🇮🇳 தமிழ்</button>
-            <button data-lang="hi">🇮🇳 हिन्दी</button>
+            <button class="language-btn active" data-lang="en">
+                🇬🇧 English
+            </button>
+
+            <button class="language-btn" data-lang="kn">
+                🇮🇳 ಕನ್ನಡ
+            </button>
+
+            <button class="language-btn" data-lang="te">
+                🇮🇳 తెలుగు
+            </button>
+
+            <button class="language-btn" data-lang="ta">
+                🇮🇳 தமிழ்
+            </button>
+
+            <button class="language-btn" data-lang="hi">
+                🇮🇳 हिन्दी
+            </button>
 
         </div>
 
-        <button id="continueBtn" class="gold-btn">
+        <button id="continueBtn" class="gold-button">
             Continue →
         </button>
 
@@ -67,780 +80,1002 @@
 </div>
 
 
-<!-- ================= MAIN APP ================= -->
+<!-- ================= MAIN APPLICATION ================= -->
 
 <div id="app" class="hidden">
 
-    <!-- HEADER -->
+<!-- HEADER -->
 
-    <header>
+<header class="header">
 
-        <div class="brand">
+    <button class="brand" onclick="showPage('home')">
 
-            <img src="she-shield-logo.png" alt="Logo">
+        <img src="she-shield-logo.png"
+             alt="SHE-SHIELD">
 
-            <div>
-                <h2>SHE-SHIELD</h2>
-                <small>Your Safety. Our Priority.</small>
-            </div>
+        <span>
+            <strong>SHE-SHIELD</strong>
+            <small>Your Safety. Our Priority.</small>
+        </span>
 
-        </div>
-
-        <div class="header-right">
-
-            <select id="languageSelect">
-                <option value="en">English</option>
-                <option value="kn">ಕನ್ನಡ</option>
-                <option value="te">తెలుగు</option>
-                <option value="ta">தமிழ்</option>
-                <option value="hi">हिन्दी</option>
-            </select>
-
-            <button id="menuBtn">☰</button>
-
-        </div>
-
-    </header>
+    </button>
 
 
-    <!-- ================= MENU ================= -->
+    <nav>
 
-    <nav id="menu">
+        <button onclick="showPage('home')">
+            Home
+        </button>
 
-        <button data-page="home">⌂ Home</button>
-        <button data-page="emergency">🚨 Emergency SOS</button>
-        <button data-page="safety">🛡 Immediate Safety</button>
-        <button data-page="contacts">👥 Trusted Contacts</button>
-        <button data-page="evidence">📷 Capture Evidence</button>
-        <button data-page="tips">💡 Safety Tips</button>
-        <button data-page="helplines">📞 Helplines</button>
-        <button data-page="battery">🔋 Battery Saver</button>
-        <button data-page="issues">📝 Customer Issues</button>
+        <button onclick="showPage('safety')">
+            Immediate Safety
+        </button>
 
     </nav>
 
 
-    <main>
+    <div class="header-right">
 
-        <!-- ================= HOME ================= -->
+        <select id="languageSelect">
 
-        <section id="home" class="page active">
+            <option value="en">English</option>
+            <option value="kn">ಕನ್ನಡ</option>
+            <option value="te">తెలుగు</option>
+            <option value="ta">தமிழ்</option>
+            <option value="hi">हिन्दी</option>
 
-            <div class="hero">
+        </select>
 
-                <div class="hero-text">
-
-                    <span class="eyebrow">
-                        ✦ WOMEN SAFETY PLATFORM
-                    </span>
-
-                    <h1>
-                        Your Safety.<br>
-                        Your Voice.<br>
-                        Your Shield.
-                    </h1>
-
-                    <p>
-                        SHE-SHIELD provides fast, simple and
-                        privacy-focused emergency safety tools
-                        whenever you need them.
-                    </p>
-
-                </div>
-
-                <div class="hero-logo">
-                    <img src="she-shield-logo.png"
-                         alt="SHE-SHIELD">
-                </div>
-
-            </div>
-
-
-            <div class="home-buttons">
-
-                <button class="home-card emergency-card"
-                        data-page="emergency">
-
-                    <div class="big-icon">🚨</div>
-
-                    <h2>Emergency SOS</h2>
-
-                    <p>
-                        Trigger emergency assistance
-                        immediately.
-                    </p>
-
-                    <span>Open Emergency SOS →</span>
-
-                </button>
-
-
-                <button class="home-card safety-card"
-                        data-page="safety">
-
-                    <div class="big-icon">🛡</div>
-
-                    <h2>Immediate Safety</h2>
-
-                    <p>
-                        Access all safety tools,
-                        contacts and protection features.
-                    </p>
-
-                    <span>Open Immediate Safety →</span>
-
-                </button>
-
-            </div>
-
-
-            <div class="feature-strip">
-
-                <div>
-                    <strong>FAST</strong>
-                    <small>Quick emergency access</small>
-                </div>
-
-                <div>
-                    <strong>PRIVATE</strong>
-                    <small>Designed with privacy in mind</small>
-                </div>
-
-                <div>
-                    <strong>5 LANGUAGES</strong>
-                    <small>English • Kannada • Telugu • Tamil • Hindi</small>
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================= EMERGENCY ================= -->
-
-        <section id="emergency" class="page">
-
-            <div class="page-title">
-                <span class="eyebrow">EMERGENCY RESPONSE</span>
-                <h1>Emergency SOS</h1>
-                <p>Use SOS when you are in immediate danger.</p>
-            </div>
-
-
-            <div class="emergency-container">
-
-                <div class="sos-box">
-
-                    <div class="location-status">
-                        <span></span>
-                        Location Ready
-                    </div>
-
-                    <button id="sosButton" class="sos-button">
-
-                        <b>!</b>
-                        <strong>SOS</strong>
-                        <small>PRESS & HOLD</small>
-
-                    </button>
-
-                    <p id="sosStatus">Ready</p>
-
-                </div>
-
-
-                <div class="emergency-info">
-
-                    <h2>Emergency Actions</h2>
-
-                    <button id="emergencyLocation"
-                            class="action-button">
-                        📍 Share Current Location
-                    </button>
-
-                    <a href="tel:112"
-                       class="action-button">
-                        📞 Call Emergency Services
-                    </a>
-
-                    <button data-page="contacts"
-                            class="action-button">
-                        👥 Contact Trusted People
-                    </button>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================= IMMEDIATE SAFETY ================= -->
-
-        <section id="safety" class="page">
-
-            <div class="page-title">
-
-                <span class="eyebrow">
-                    IMMEDIATE SAFETY
-                </span>
-
-                <h1>Your Safety Toolkit</h1>
-
-                <p>
-                    Choose the tool that best matches your situation.
-                </p>
-
-            </div>
-
-
-            <div class="tools-grid">
-
-
-                <!-- TRUSTED CONTACTS -->
-
-                <button class="tool-card"
-                        data-page="contacts">
-
-                    <span>👥</span>
-                    <h3>Trusted Contacts</h3>
-                    <p>Save at least five trusted people.</p>
-
-                </button>
-
-
-                <!-- SILENT SOS -->
-
-                <button class="tool-card"
-                        id="silentSOS">
-
-                    <span>🔇</span>
-                    <h3>Silent SOS</h3>
-                    <p>Share location without siren or flash.</p>
-
-                </button>
-
-
-                <!-- VOICE SOS -->
-
-                <button class="tool-card"
-                        id="voiceSOS">
-
-                    <span>🎙</span>
-                    <h3>Voice SOS</h3>
-                    <p>Say "PHONE" to trigger SOS.</p>
-
-                </button>
-
-
-                <!-- SHAKE -->
-
-                <button class="tool-card"
-                        id="shakeSOS">
-
-                    <span>📳</span>
-                    <h3>Shake SOS</h3>
-                    <p>Shake your phone to trigger SOS.</p>
-
-                </button>
-
-
-                <!-- AUTO -->
-
-                <button class="tool-card"
-                        id="autoSOS">
-
-                    <span>⏱</span>
-                    <h3>Auto SOS</h3>
-                    <p>10-second emergency countdown.</p>
-
-                </button>
-
-
-                <!-- EVIDENCE -->
-
-                <button class="tool-card"
-                        data-page="evidence">
-
-                    <span>📷</span>
-                    <h3>Capture Evidence</h3>
-                    <p>Photos, videos, audio and uploads.</p>
-
-                </button>
-
-
-                <!-- FAKE CALL -->
-
-                <button class="tool-card"
-                        id="fakeCall">
-
-                    <span>📱</span>
-                    <h3>Fake Calling</h3>
-                    <p>Simulated strict father call.</p>
-
-                </button>
-
-
-                <!-- TIPS -->
-
-                <button class="tool-card"
-                        data-page="tips">
-
-                    <span>💡</span>
-                    <h3>Safety Tips</h3>
-                    <p>Practical safety guidance.</p>
-
-                </button>
-
-
-                <!-- HELPLINES -->
-
-                <button class="tool-card"
-                        data-page="helplines">
-
-                    <span>📞</span>
-                    <h3>Helplines</h3>
-                    <p>Police, ambulance and support.</p>
-
-                </button>
-
-
-                <!-- BATTERY -->
-
-                <button class="tool-card"
-                        data-page="battery">
-
-                    <span>🔋</span>
-                    <h3>Battery Saver</h3>
-                    <p>Reduce unnecessary battery usage.</p>
-
-                </button>
-
-
-                <!-- CUSTOMER -->
-
-                <button class="tool-card"
-                        data-page="issues">
-
-                    <span>📝</span>
-                    <h3>Customer Issues</h3>
-                    <p>Report problems or suggestions.</p>
-
-                </button>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================= CONTACTS ================= -->
-
-        <section id="contacts" class="page">
-
-            <div class="page-title">
-
-                <span class="eyebrow">
-                    TRUSTED SUPPORT
-                </span>
-
-                <h1>Trusted Contacts</h1>
-
-                <p>
-                    Add a minimum of five trusted contacts.
-                </p>
-
-            </div>
-
-
-            <div class="contacts-card">
-
-                <div id="contactInputs"></div>
-
-                <button id="saveContacts"
-                        class="gold-btn">
-                    Save Contacts
-                </button>
-
-                <p id="contactStatus"></p>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================= EVIDENCE ================= -->
-
-        <section id="evidence" class="page">
-
-            <div class="page-title">
-
-                <span class="eyebrow">
-                    EVIDENCE COLLECTION
-                </span>
-
-                <h1>Capture Evidence</h1>
-
-                <p>
-                    Capture photos, videos and audio or upload
-                    recent files.
-                </p>
-
-            </div>
-
-
-            <div class="evidence-container">
-
-                <button id="cameraBtn" class="gold-btn">
-                    📷 Open Camera
-                </button>
-
-                <button id="audioBtn" class="gold-btn">
-                    🎙 Record Audio
-                </button>
-
-                <label class="upload-button">
-                    📁 Upload Recent Files
-                    <input id="fileUpload"
-                           type="file"
-                           accept="image/*,video/*,audio/*"
-                           multiple>
-                </label>
-
-
-                <video id="cameraPreview"
-                       autoplay
-                       playsinline
-                       class="camera-preview hidden">
-                </video>
-
-
-                <div class="evidence-actions">
-
-                    <button id="photoBtn">
-                        📸 Take Photo
-                    </button>
-
-                    <button id="videoBtn">
-                        🎥 Start Video
-                    </button>
-
-                    <button id="stopVideoBtn">
-                        ⏹ Stop Video
-                    </button>
-
-                    <button id="stopAudioBtn">
-                        ⏹ Stop Audio
-                    </button>
-
-                </div>
-
-
-                <div id="evidencePreview"></div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================= TIPS ================= -->
-
-        <section id="tips" class="page">
-
-            <div class="page-title">
-
-                <span class="eyebrow">
-                    SAFETY GUIDANCE
-                </span>
-
-                <h1>Safety Tips</h1>
-
-            </div>
-
-
-            <div class="tips-grid">
-
-                <article>
-                    <b>01</b>
-                    <h3>Move to a safer place</h3>
-                    <p>
-                        If possible, move to a public,
-                        well-lit location.
-                    </p>
-                </article>
-
-                <article>
-                    <b>02</b>
-                    <h3>Stay connected</h3>
-                    <p>
-                        Inform someone you trust about
-                        your situation.
-                    </p>
-                </article>
-
-                <article>
-                    <b>03</b>
-                    <h3>Keep your phone accessible</h3>
-                    <p>
-                        Keep emergency communication
-                        easily available.
-                    </p>
-                </article>
-
-                <article>
-                    <b>04</b>
-                    <h3>Trust your instincts</h3>
-                    <p>
-                        If a situation feels unsafe,
-                        move away and seek help.
-                    </p>
-                </article>
-
-                <article>
-                    <b>05</b>
-                    <h3>Use emergency services</h3>
-                    <p>
-                        Contact appropriate emergency
-                        services during immediate danger.
-                    </p>
-                </article>
-
-                <article>
-                    <b>06</b>
-                    <h3>Protect your evidence</h3>
-                    <p>
-                        Keep important evidence secure
-                        and avoid deleting it.
-                    </p>
-                </article>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================= HELPLINES ================= -->
-
-        <section id="helplines" class="page">
-
-            <div class="page-title">
-
-                <span class="eyebrow">
-                    HELP & SUPPORT
-                </span>
-
-                <h1>Emergency Helplines</h1>
-
-            </div>
-
-
-            <div class="helpline-grid">
-
-                <a href="tel:112">
-                    🚔
-                    <strong>Police / Emergency</strong>
-                    <span>112</span>
-                </a>
-
-                <a href="tel:108">
-                    🚑
-                    <strong>Ambulance</strong>
-                    <span>108</span>
-                </a>
-
-                <a href="tel:181">
-                    👩
-                    <strong>Women Helpline</strong>
-                    <span>181</span>
-                </a>
-
-                <a href="tel:1091">
-                    🛡
-                    <strong>Women Police Helpline</strong>
-                    <span>1091</span>
-                </a>
-
-                <a href="tel:1098">
-                    👧
-                    <strong>Child Helpline</strong>
-                    <span>1098</span>
-                </a>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================= BATTERY ================= -->
-
-        <section id="battery" class="page">
-
-            <div class="page-title">
-
-                <span class="eyebrow">
-                    EMERGENCY POWER
-                </span>
-
-                <h1>Battery Saver Mode</h1>
-
-                <p>
-                    Reduce unnecessary browser activity during
-                    an emergency.
-                </p>
-
-            </div>
-
-
-            <div class="battery-card">
-
-                <div class="battery-icon">
-                    🔋
-                </div>
-
-                <h2 id="batteryState">
-                    Battery Saver is OFF
-                </h2>
-
-                <p>
-                    This mode reduces animations,
-                    background activity and unnecessary
-                    visual effects.
-                </p>
-
-                <button id="batterySaverBtn"
-                        class="gold-btn">
-                    Activate Battery Saver
-                </button>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================= CUSTOMER ISSUES ================= -->
-
-        <section id="issues" class="page">
-
-            <div class="page-title">
-
-                <span class="eyebrow">
-                    CUSTOMER SUPPORT
-                </span>
-
-                <h1>Customer Issues</h1>
-
-                <p>
-                    Tell us about a problem, suggestion or feedback.
-                </p>
-
-            </div>
-
-
-            <div class="issue-card">
-
-                <input id="issueName"
-                       type="text"
-                       placeholder="Your name">
-
-                <input id="issueEmail"
-                       type="email"
-                       placeholder="Email">
-
-                <select id="issueType">
-
-                    <option value="problem">
-                        Technical Problem
-                    </option>
-
-                    <option value="suggestion">
-                        Suggestion
-                    </option>
-
-                    <option value="feedback">
-                        Feedback
-                    </option>
-
-                    <option value="other">
-                        Other
-                    </option>
-
-                </select>
-
-                <textarea id="issueText"
-                          placeholder="Describe your issue...">
-                </textarea>
-
-                <button id="submitIssue"
-                        class="gold-btn">
-                    Submit Issue
-                </button>
-
-                <p id="issueStatus"></p>
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <!-- ================= AUTO SOS MODAL ================= -->
-
-    <div id="autoModal" class="modal hidden">
-
-        <div class="modal-card">
-
-            <h2>Auto SOS</h2>
-
-            <p>SOS will activate in</p>
-
-            <div id="countdown">10</div>
-
-            <button id="stopAuto"
-                    class="stop-btn">
-                STOP SOS
-            </button>
-
-        </div>
+        <button id="menuBtn" class="menu-button">
+            ☰
+        </button>
 
     </div>
 
+</header>
 
-    <!-- ================= FAKE CALL ================= -->
 
-    <div id="fakeCallScreen" class="fake-call hidden">
+<!-- SIDE MENU -->
 
-        <div class="fake-call-top">
-            📱 Incoming Call
-        </div>
+<div id="sideMenu" class="side-menu">
 
-        <div class="fake-avatar">
-            👨
-        </div>
+    <button onclick="showPage('home')">
+        🏠 Home
+    </button>
 
-        <h1 id="callerName">
-            Dad
-        </h1>
+    <button onclick="showPage('safety')">
+        🛡️ Immediate Safety
+    </button>
 
-        <p>Mobile</p>
+    <button onclick="emergencySOS()">
+        🚨 Emergency SOS
+    </button>
 
-        <div class="call-buttons">
+    <button onclick="showPage('contacts')">
+        👥 Trusted Contacts
+    </button>
 
-            <button id="declineCall">
-                ❌
-            </button>
+    <button onclick="showPage('evidence')">
+        📷 Capture Evidence
+    </button>
 
-            <button id="answerCall">
-                📞
-            </button>
+    <button onclick="showPage('tips')">
+        💡 Safety Tips
+    </button>
 
-        </div>
+    <button onclick="showPage('helplines')">
+        📞 Help Lines
+    </button>
 
-    </div>
+    <button onclick="showPage('battery')">
+        🔋 Battery Saver
+    </button>
 
+    <button onclick="showPage('issues')">
+        📝 Customer Issues
+    </button>
 
 </div>
 
+
+<!-- ================= CONTENT ================= -->
+
+<main>
+
+
+<!-- ================= HOME ================= -->
+
+<section id="home" class="page active">
+
+    <div class="hero">
+
+        <div class="hero-text">
+
+            <span class="eyebrow">
+                ✦ WOMEN SAFETY PLATFORM
+            </span>
+
+            <h1>
+                Your Safety.<br>
+                Your Voice.<br>
+                Your Shield.
+            </h1>
+
+            <p>
+                SHE-SHIELD provides fast,
+                simple and privacy-focused
+                emergency safety tools whenever
+                you need them.
+            </p>
+
+        </div>
+
+
+        <div class="hero-image">
+
+            <img src="she-shield-logo.png"
+                 alt="SHE-SHIELD">
+
+        </div>
+
+    </div>
+
+
+    <div class="home-cards">
+
+        <!-- EMERGENCY SOS -->
+
+        <div class="home-card emergency-card">
+
+            <div class="card-icon">
+                🚨
+            </div>
+
+            <h2>
+                Emergency SOS
+            </h2>
+
+            <p>
+                Trigger emergency assistance immediately.
+            </p>
+
+            <button class="danger-button"
+                    onclick="emergencySOS()">
+
+                ACTIVATE EMERGENCY SOS
+
+            </button>
+
+        </div>
+
+
+        <!-- IMMEDIATE SAFETY -->
+
+        <div class="home-card">
+
+            <div class="card-icon">
+                🛡️
+            </div>
+
+            <h2>
+                Immediate Safety
+            </h2>
+
+            <p>
+                Access all safety tools,
+                trusted contacts and protection features.
+            </p>
+
+            <button class="gold-button"
+                    onclick="showPage('safety')">
+
+                OPEN IMMEDIATE SAFETY →
+
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= IMMEDIATE SAFETY ================= -->
+
+<section id="safety" class="page">
+
+    <div class="page-heading">
+
+        <span class="eyebrow">
+            IMMEDIATE SAFETY
+        </span>
+
+        <h1>
+            Your Safety Toolkit
+        </h1>
+
+        <p>
+            Choose the tool that best matches your situation.
+        </p>
+
+    </div>
+
+
+    <div class="tool-grid">
+
+
+        <!-- TRUSTED CONTACTS -->
+
+        <button class="tool-card"
+                onclick="showPage('contacts')">
+
+            <span>👥</span>
+
+            <strong>
+                Trusted Contacts
+            </strong>
+
+            <small>
+                Save at least five trusted people.
+            </small>
+
+        </button>
+
+
+        <!-- SILENT SOS -->
+
+        <button class="tool-card"
+                onclick="silentSOS()">
+
+            <span>🔕</span>
+
+            <strong>
+                Silent SOS
+            </strong>
+
+            <small>
+                Share location without siren or flashlight.
+            </small>
+
+        </button>
+
+
+        <!-- VOICE SOS -->
+
+        <button class="tool-card"
+                onclick="startVoiceSOS()">
+
+            <span>🎙️</span>
+
+            <strong>
+                Voice SOS
+            </strong>
+
+            <small>
+                Say "PHONE" to trigger SOS.
+            </small>
+
+        </button>
+
+
+        <!-- SHAKE SOS -->
+
+        <button class="tool-card"
+                onclick="enableShakeSOS()">
+
+            <span>📳</span>
+
+            <strong>
+                Shake SOS
+            </strong>
+
+            <small>
+                Shake your phone to trigger SOS.
+            </small>
+
+        </button>
+
+
+        <!-- AUTO SOS -->
+
+        <button class="tool-card"
+                onclick="startAutoSOS()">
+
+            <span>⏱️</span>
+
+            <strong>
+                Auto SOS
+            </strong>
+
+            <small>
+                10-second emergency countdown.
+            </small>
+
+        </button>
+
+
+        <!-- CAPTURE EVIDENCE -->
+
+        <button class="tool-card"
+                onclick="showPage('evidence')">
+
+            <span>📷</span>
+
+            <strong>
+                Capture Evidence
+            </strong>
+
+            <small>
+                Photos, videos, audio and uploads.
+            </small>
+
+        </button>
+
+
+        <!-- FAKE CALL -->
+
+        <button class="tool-card"
+                onclick="openFakeCall()">
+
+            <span>📱</span>
+
+            <strong>
+                Fake Calling
+            </strong>
+
+            <small>
+                Realistic strict-father voice call.
+            </small>
+
+        </button>
+
+
+        <!-- SIREN -->
+
+        <button class="tool-card"
+                onclick="toggleSiren()">
+
+            <span>🔊</span>
+
+            <strong>
+                Siren
+            </strong>
+
+            <small>
+                Play or stop emergency siren.
+            </small>
+
+        </button>
+
+
+        <!-- SAFETY TIPS -->
+
+        <button class="tool-card"
+                onclick="showPage('tips')">
+
+            <span>💡</span>
+
+            <strong>
+                Safety Tips
+            </strong>
+
+            <small>
+                Practical safety guidance.
+            </small>
+
+        </button>
+
+
+        <!-- HELPLINES -->
+
+        <button class="tool-card"
+                onclick="showPage('helplines')">
+
+            <span>📞</span>
+
+            <strong>
+                Help Lines
+            </strong>
+
+            <small>
+                Police, ambulance and women support.
+            </small>
+
+        </button>
+
+
+        <!-- BATTERY -->
+
+        <button class="tool-card"
+                onclick="showPage('battery')">
+
+            <span>🔋</span>
+
+            <strong>
+                Battery Saver
+            </strong>
+
+            <small>
+                Reduce SHE-SHIELD power usage.
+            </small>
+
+        </button>
+
+
+        <!-- CUSTOMER ISSUES -->
+
+        <button class="tool-card"
+                onclick="showPage('issues')">
+
+            <span>📝</span>
+
+            <strong>
+                Customer Issues
+            </strong>
+
+            <small>
+                Report a problem or suggestion.
+            </small>
+
+        </button>
+
+    </div>
+
+
+    <div class="quick-actions">
+
+        <button onclick="shareLocation()">
+            📍 Share Current Location
+        </button>
+
+        <a href="tel:112">
+            📞 Call 112
+        </a>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= TRUSTED CONTACTS ================= -->
+
+<section id="contacts" class="page">
+
+    <div class="page-heading">
+
+        <span class="eyebrow">
+            TRUSTED SUPPORT
+        </span>
+
+        <h1>
+            Trusted Contacts
+        </h1>
+
+        <p>
+            Add a minimum of five trusted contacts.
+        </p>
+
+    </div>
+
+
+    <div class="panel">
+
+        <div id="contactFields"></div>
+
+        <button id="saveContacts"
+                class="gold-button wide">
+
+            Save Contacts
+
+        </button>
+
+        <p id="contactStatus"></p>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= CAPTURE EVIDENCE ================= -->
+
+<section id="evidence" class="page">
+
+    <div class="page-heading">
+
+        <span class="eyebrow">
+            SECURE EVIDENCE
+        </span>
+
+        <h1>
+            Capture Evidence
+        </h1>
+
+        <p>
+            Use your camera, microphone or upload recent files.
+        </p>
+
+    </div>
+
+
+    <div class="panel">
+
+        <div class="camera-box">
+
+            <video id="cameraPreview"
+                   autoplay
+                   muted
+                   playsinline>
+            </video>
+
+        </div>
+
+
+        <div class="evidence-buttons">
+
+            <button id="cameraBtn"
+                    class="gold-button">
+
+                📷 Start Camera
+
+            </button>
+
+
+            <button id="photoBtn"
+                    class="soft-button">
+
+                Take Photo
+
+            </button>
+
+
+            <button id="recordBtn"
+                    class="soft-button">
+
+                🎙 Start Audio
+
+            </button>
+
+
+            <button id="stopRecordBtn"
+                    class="soft-button">
+
+                Stop Recording
+
+            </button>
+
+        </div>
+
+
+        <canvas id="photoCanvas" hidden></canvas>
+
+
+        <input id="fileUpload"
+               type="file"
+               accept="image/*,video/*,audio/*"
+               multiple>
+
+
+        <div id="evidenceFiles"></div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= SAFETY TIPS ================= -->
+
+<section id="tips" class="page">
+
+    <div class="page-heading">
+
+        <span class="eyebrow">
+            SAFETY GUIDANCE
+        </span>
+
+        <h1>
+            Safety Tips
+        </h1>
+
+    </div>
+
+
+    <div class="tips-grid">
+
+        <div>
+            <b>01</b>
+            <h3>Move to a safer place</h3>
+            <p>
+                Move towards a public,
+                well-lit location whenever possible.
+            </p>
+        </div>
+
+
+        <div>
+            <b>02</b>
+            <h3>Contact someone you trust</h3>
+            <p>
+                Tell a trusted person where you are.
+            </p>
+        </div>
+
+
+        <div>
+            <b>03</b>
+            <h3>Keep your phone accessible</h3>
+            <p>
+                Keep your phone ready for emergency communication.
+            </p>
+        </div>
+
+
+        <div>
+            <b>04</b>
+            <h3>Protect your privacy</h3>
+            <p>
+                Avoid sharing sensitive personal information publicly.
+            </p>
+        </div>
+
+
+        <div>
+            <b>05</b>
+            <h3>Use emergency services</h3>
+            <p>
+                If you are in immediate danger,
+                contact emergency services.
+            </p>
+        </div>
+
+
+        <div>
+            <b>06</b>
+            <h3>Trust your instincts</h3>
+            <p>
+                If something feels unsafe,
+                move away and seek help.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= HELPLINES ================= -->
+
+<section id="helplines" class="page">
+
+    <div class="page-heading">
+
+        <span class="eyebrow">
+            EMERGENCY SUPPORT
+        </span>
+
+        <h1>
+            Help Lines
+        </h1>
+
+        <p>
+            Use the appropriate service for your situation.
+        </p>
+
+    </div>
+
+
+    <div class="helpline-grid">
+
+        <a href="tel:112">
+            🚔
+            <strong>Police</strong>
+            <span>112</span>
+        </a>
+
+
+        <a href="tel:112">
+            🚑
+            <strong>Ambulance</strong>
+            <span>112</span>
+        </a>
+
+
+        <a href="tel:181">
+            👩
+            <strong>Women Helpline</strong>
+            <span>181</span>
+        </a>
+
+
+        <a href="tel:1091">
+            🛡️
+            <strong>Women Police Helpline</strong>
+            <span>1091</span>
+        </a>
+
+
+        <a href="tel:1098">
+            👧
+            <strong>Child Helpline</strong>
+            <span>1098</span>
+        </a>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= BATTERY SAVER ================= -->
+
+<section id="battery" class="page">
+
+    <div class="page-heading">
+
+        <span class="eyebrow">
+            EMERGENCY POWER
+        </span>
+
+        <h1>
+            Battery Saver Mode
+        </h1>
+
+        <p>
+            Reduce SHE-SHIELD's own power usage during emergencies.
+        </p>
+
+    </div>
+
+
+    <div class="panel battery-panel">
+
+        <div class="battery-icon">
+            🔋
+        </div>
+
+        <h2 id="batteryState">
+            Battery Saver is OFF
+        </h2>
+
+        <p>
+            Animations and unnecessary background activity
+            will be reduced when enabled.
+        </p>
+
+        <button id="batteryBtn"
+                class="gold-button">
+
+            Enable Battery Saver
+
+        </button>
+
+
+        <div class="battery-meter">
+            <span id="batteryLevel"></span>
+        </div>
+
+        <small id="batteryInfo">
+            Checking battery...
+        </small>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= CUSTOMER ISSUES ================= -->
+
+<section id="issues" class="page">
+
+    <div class="page-heading">
+
+        <span class="eyebrow">
+            SUPPORT
+        </span>
+
+        <h1>
+            Customer Issues
+        </h1>
+
+        <p>
+            Tell us what went wrong or what should be improved.
+        </p>
+
+    </div>
+
+
+    <form id="issueForm"
+          class="panel">
+
+        <input id="issueName"
+               placeholder="Your name">
+
+
+        <input id="issueEmail"
+               type="email"
+               placeholder="Email (optional)">
+
+
+        <select id="issueType">
+
+            <option>
+                Bug / Feature not working
+            </option>
+
+            <option>
+                Suggestion
+            </option>
+
+            <option>
+                Accessibility
+            </option>
+
+            <option>
+                Other
+            </option>
+
+        </select>
+
+
+        <textarea id="issueText"
+                  required
+                  placeholder="Describe the issue..."></textarea>
+
+
+        <button class="gold-button"
+                type="submit">
+
+            Save Issue
+
+        </button>
+
+
+        <p id="issueStatus"></p>
+
+    </form>
+
+</section>
+
+</main>
+
+
+
+<!-- ================= AUTO SOS MODAL ================= -->
+
+<div id="autoModal"
+     class="modal hidden">
+
+    <div class="modal-box">
+
+        <span class="eyebrow">
+            AUTO SOS
+        </span>
+
+        <div id="countdown"
+             class="countdown">
+
+            10
+
+        </div>
+
+        <h2>
+            Emergency SOS will trigger
+        </h2>
+
+        <p>
+            Stop it now if you do not need emergency assistance.
+        </p>
+
+        <button id="stopAuto"
+                class="danger-button wide">
+
+            STOP SOS
+
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- ================= FAKE CALL ================= -->
+
+<div id="fakeModal"
+     class="modal hidden">
+
+    <div class="fake-phone">
+
+        <button id="closeFake"
+                class="close-button">
+
+            ×
+
+        </button>
+
+
+        <img src="she-shield-logo.png"
+             class="fake-logo"
+             alt="">
+
+
+        <small>
+            INCOMING CALL
+        </small>
+
+
+        <h2>
+            Dad
+        </h2>
+
+
+        <p id="fakeStatus">
+            Calling...
+        </p>
+
+
+        <div class="call-buttons">
+
+            <button id="answerFake">
+                📞
+            </button>
+
+            <button id="endFake">
+                ✕
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ================= EMERGENCY OVERLAY ================= -->
+
+<div id="emergencyOverlay"
+     class="emergency-overlay hidden">
+
+    <div>
+
+        <div class="big-sos">
+            SOS
+        </div>
+
+        <h1>
+            Emergency SOS Activated
+        </h1>
+
+        <p id="emergencyStatus">
+            Taking emergency action...
+        </p>
+
+        <button id="closeEmergency"
+                class="soft-button">
+
+            Close
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<div id="toast"
+     class="toast">
+</div>
+
+
 <script src="script.js"></script>
+
+</div>
 
 </body>
 </html>
