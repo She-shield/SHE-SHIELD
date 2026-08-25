@@ -1,161 +1,362 @@
-/* =========================================================
+/* =====================================================
    SHE-SHIELD JAVASCRIPT
-   ========================================================= */
+===================================================== */
 
-const STORAGE = {
-    language: "sheShieldLanguage",
-    contacts: "sheShieldContacts",
-    issues: "sheShieldIssues"
-};
+"use strict";
 
 
-/* ================= GLOBAL VARIABLES ================= */
+/* =====================================================
+   GLOBAL VARIABLES
+===================================================== */
 
-let currentLanguage =
-    localStorage.getItem(STORAGE.language) || "en";
+let selectedLanguage = "en";
+
+let contacts = JSON.parse(
+    localStorage.getItem("sheShieldContacts") || "[]"
+);
+
+let evidence = JSON.parse(
+    localStorage.getItem("sheShieldEvidence") || "[]"
+);
 
 let autoTimer = null;
-let autoSeconds = 10;
 
 let voiceRecognition = null;
+
 let voiceListening = false;
 
-let shakeEnabled = false;
-let lastShake = 0;
-
-let cameraStream = null;
-
-let mediaRecorder = null;
-let recordedChunks = [];
-
-let fakeCallPlaying = false;
+let shakeLastTime = 0;
 
 let batterySaver = false;
 
+let sirenAudio = new Audio("siren.mp3");
 
-/* ================= SIREN ================= */
-
-const siren = new Audio("siren.mp3");
-
-siren.preload = "auto";
-
-siren.loop = true;
+sirenAudio.loop = true;
 
 
-/* ================= TRANSLATIONS ================= */
+/* =====================================================
+   TRANSLATIONS
+===================================================== */
 
 const translations = {
 
     en: {
-        home: "Home",
-        immediate: "Immediate Safety"
+
+        tagline: "Your Safety. Our Priority.",
+
+        choose: "Choose Your Language",
+
+        select: "Select your preferred language",
+
+        continue: "Continue →",
+
+        homeTitle:
+            "Your Safety.<br>Your Voice.<br>Your Shield.",
+
+        homeDescription:
+            "SHE-SHIELD provides fast, simple and privacy-focused emergency safety tools whenever you need them.",
+
+        emergency:
+            "Emergency SOS",
+
+        emergencyText:
+            "Trigger emergency assistance immediately.",
+
+        safety:
+            "Immediate Safety",
+
+        safetyText:
+            "Access all safety tools, contacts and protection features.",
+
+        activate:
+            "ACTIVATE SOS →",
+
+        openSafety:
+            "OPEN SAFETY →",
+
+        father: [
+
+            "Hello, where are you?",
+
+            "Why are you not answering your phone?",
+
+            "Call me immediately.",
+
+            "Tell me exactly where you are.",
+
+            "Do not stay outside alone.",
+
+            "I am waiting for your call.",
+
+            "Come home safely.",
+
+            "Call me as soon as you hear this.",
+
+            "And keep your phone with you.",
+
+            "I want to know that you are safe."
+
+        ]
+
     },
+
 
     kn: {
-        home: "ಮುಖಪುಟ",
-        immediate: "ತಕ್ಷಣದ ಸುರಕ್ಷತೆ"
+
+        tagline: "ನಿಮ್ಮ ಸುರಕ್ಷತೆ. ನಮ್ಮ ಆದ್ಯತೆ.",
+
+        choose: "ನಿಮ್ಮ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+
+        select: "ನಿಮ್ಮ ಇಷ್ಟದ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+
+        continue: "ಮುಂದುವರಿಸಿ →",
+
+        homeTitle:
+            "ನಿಮ್ಮ ಸುರಕ್ಷತೆ.<br>ನಿಮ್ಮ ಧ್ವನಿ.<br>ನಿಮ್ಮ ರಕ್ಷಣೆ.",
+
+        homeDescription:
+            "SHE-SHIELD ನಿಮಗೆ ಅಗತ್ಯವಿರುವಾಗ ವೇಗವಾದ ಮತ್ತು ಸರಳವಾದ ಸುರಕ್ಷತಾ ಸಾಧನಗಳನ್ನು ಒದಗಿಸುತ್ತದೆ.",
+
+        emergency:
+            "ತುರ್ತು SOS",
+
+        emergencyText:
+            "ತಕ್ಷಣ ತುರ್ತು ಸಹಾಯವನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ.",
+
+        safety:
+            "ತಕ್ಷಣದ ಸುರಕ್ಷತೆ",
+
+        safetyText:
+            "ಎಲ್ಲಾ ಸುರಕ್ಷತಾ ಸಾಧನಗಳು ಮತ್ತು ಸಂಪರ್ಕಗಳನ್ನು ಪ್ರವೇಶಿಸಿ.",
+
+        activate:
+            "SOS ಸಕ್ರಿಯಗೊಳಿಸಿ →",
+
+        openSafety:
+            "ಸುರಕ್ಷತೆ ತೆರೆಯಿರಿ →",
+
+        father: [
+
+            "ಎಲ್ಲಿ ಇದ್ದೀಯ?",
+
+            "ನಿನ್ನ ಫೋನ್‌ಗೆ ಏಕೆ ಉತ್ತರಿಸುತ್ತಿಲ್ಲ?",
+
+            "ತಕ್ಷಣ ನನಗೆ ಕರೆ ಮಾಡು.",
+
+            "ನೀನು ಎಲ್ಲಿದ್ದೀಯ ಎಂದು ಹೇಳು.",
+
+            "ಒಬ್ಬಳೇ ಹೊರಗೆ ಇರಬೇಡ.",
+
+            "ನಾನು ನಿನ್ನ ಕರೆಗಾಗಿ ಕಾಯುತ್ತಿದ್ದೇನೆ.",
+
+            "ಸುರಕ್ಷಿತವಾಗಿ ಮನೆಗೆ ಬಾ.",
+
+            "ಇದನ್ನು ಕೇಳಿದ ತಕ್ಷಣ ನನಗೆ ಕರೆ ಮಾಡು.",
+
+            "ಫೋನ್ ನಿನ್ನ ಹತ್ತಿರ ಇಟ್ಟುಕೋ.",
+
+            "ನೀನು ಸುರಕ್ಷಿತವಾಗಿದ್ದೀಯ ಎಂದು ನನಗೆ ತಿಳಿಯಬೇಕು."
+
+        ]
+
     },
+
 
     te: {
-        home: "హోమ్",
-        immediate: "తక్షణ భద్రత"
+
+        tagline: "మీ భద్రత. మా ప్రాధాన్యత.",
+
+        choose: "మీ భాషను ఎంచుకోండి",
+
+        select: "మీకు ఇష్టమైన భాషను ఎంచుకోండి",
+
+        continue: "కొనసాగించండి →",
+
+        homeTitle:
+            "మీ భద్రత.<br>మీ స్వరం.<br>మీ రక్షణ.",
+
+        homeDescription:
+            "SHE-SHIELD మీకు అవసరమైనప్పుడు వేగవంతమైన మరియు సులభమైన భద్రతా సాధనాలను అందిస్తుంది.",
+
+        emergency:
+            "అత్యవసర SOS",
+
+        emergencyText:
+            "వెంటనే అత్యవసర సహాయాన్ని ప్రారంభించండి.",
+
+        safety:
+            "తక్షణ భద్రత",
+
+        safetyText:
+            "అన్ని భద్రతా సాధనాలు మరియు పరిచయాలను యాక్సెస్ చేయండి.",
+
+        activate:
+            "SOS ప్రారంభించండి →",
+
+        openSafety:
+            "భద్రత తెరవండి →",
+
+        father: [
+
+            "ఎక్కడ ఉన్నావు?",
+
+            "నీ ఫోన్ ఎందుకు ఎత్తడం లేదు?",
+
+            "వెంటనే నాకు కాల్ చేయి.",
+
+            "నువ్వు ఎక్కడ ఉన్నావో చెప్పు.",
+
+            "ఒంటరిగా బయట ఉండకు.",
+
+            "నీ కాల్ కోసం నేను ఎదురు చూస్తున్నాను.",
+
+            "సురక్షితంగా ఇంటికి రా.",
+
+            "ఇది విన్న వెంటనే నాకు కాల్ చేయి.",
+
+            "ఫోన్ నీ దగ్గరే ఉంచుకో.",
+
+            "నువ్వు సురక్షితంగా ఉన్నావని నాకు తెలుసుకోవాలి."
+
+        ]
+
     },
+
 
     ta: {
-        home: "முகப்பு",
-        immediate: "உடனடி பாதுகாப்பு"
+
+        tagline: "உங்கள் பாதுகாப்பு. எங்கள் முன்னுரிமை.",
+
+        choose: "உங்கள் மொழியை தேர்வு செய்யவும்",
+
+        select: "உங்களுக்கு விருப்பமான மொழியை தேர்வு செய்யவும்",
+
+        continue: "தொடரவும் →",
+
+        homeTitle:
+            "உங்கள் பாதுகாப்பு.<br>உங்கள் குரல்.<br>உங்கள் கேடயம்.",
+
+        homeDescription:
+            "SHE-SHIELD உங்களுக்கு தேவையான நேரத்தில் வேகமான மற்றும் எளிய பாதுகாப்பு கருவிகளை வழங்குகிறது.",
+
+        emergency:
+            "அவசர SOS",
+
+        emergencyText:
+            "உடனடியாக அவசர உதவியை செயல்படுத்தவும்.",
+
+        safety:
+            "உடனடி பாதுகாப்பு",
+
+        safetyText:
+            "அனைத்து பாதுகாப்பு கருவிகள் மற்றும் தொடர்புகளை அணுகவும்.",
+
+        activate:
+            "SOS செயல்படுத்து →",
+
+        openSafety:
+            "பாதுகாப்பை திறக்கவும் →",
+
+        father: [
+
+            "எங்கே இருக்கிறாய்?",
+
+            "ஏன் போனை எடுக்கவில்லை?",
+
+            "உடனே எனக்கு அழைப்பு செய்.",
+
+            "நீ எங்கே இருக்கிறாய் என்று சொல்.",
+
+            "தனியாக வெளியே இருக்காதே.",
+
+            "உன் அழைப்புக்காக நான் காத்திருக்கிறேன்.",
+
+            "பாதுகாப்பாக வீட்டிற்கு வா.",
+
+            "இதை கேட்டவுடன் எனக்கு அழைப்பு செய்.",
+
+            "போனை உன்னுடன் வைத்துக்கொள்.",
+
+            "நீ பாதுகாப்பாக இருக்கிறாய் என்பதை நான் தெரிந்துகொள்ள வேண்டும்."
+
+        ]
+
     },
 
+
     hi: {
-        home: "होम",
-        immediate: "तत्काल सुरक्षा"
+
+        tagline: "आपकी सुरक्षा. हमारी प्राथमिकता.",
+
+        choose: "अपनी भाषा चुनें",
+
+        select: "अपनी पसंदीदा भाषा चुनें",
+
+        continue: "जारी रखें →",
+
+        homeTitle:
+            "आपकी सुरक्षा।<br>आपकी आवाज़।<br>आपकी ढाल।",
+
+        homeDescription:
+            "SHE-SHIELD जरूरत के समय तेज़ और सरल सुरक्षा उपकरण प्रदान करता है।",
+
+        emergency:
+            "आपातकालीन SOS",
+
+        emergencyText:
+            "तुरंत आपातकालीन सहायता सक्रिय करें।",
+
+        safety:
+            "तत्काल सुरक्षा",
+
+        safetyText:
+            "सभी सुरक्षा उपकरण और संपर्कों तक पहुंचें।",
+
+        activate:
+            "SOS सक्रिय करें →",
+
+        openSafety:
+            "सुरक्षा खोलें →",
+
+        father: [
+
+            "तुम कहाँ हो?",
+
+            "फोन क्यों नहीं उठा रही हो?",
+
+            "तुरंत मुझे फोन करो.",
+
+            "तुम कहाँ हो यह बताओ.",
+
+            "अकेले बाहर मत रहो.",
+
+            "मैं तुम्हारे फोन का इंतजार कर रहा हूँ.",
+
+            "सुरक्षित घर आओ.",
+
+            "यह सुनते ही मुझे फोन करो.",
+
+            "फोन अपने पास रखो.",
+
+            "मुझे पता होना चाहिए कि तुम सुरक्षित हो."
+
+        ]
+
     }
 
 };
 
 
-/* ================= FAKE CALL SCRIPTS ================= */
+/* =====================================================
+   SPLASH
+===================================================== */
 
-const fatherScripts = {
-
-    en: [
-        "Where are you? Pick up the phone.",
-        "I told you to keep your phone with you.",
-        "Tell me exactly where you are.",
-        "Do not go anywhere alone.",
-        "Stay in a safe and public place.",
-        "I am coming. Keep the line open.",
-        "If there is any danger, call the emergency service.",
-        "Listen to me carefully and do not take unnecessary risks."
-    ],
-
-    kn: [
-        "ಎಲ್ಲಿ ಇದ್ದೀಯ? ಫೋನ್ ತೆಗೆದುಕೋ.",
-        "ಫೋನ್ ನಿನ್ನ ಹತ್ತಿರ ಇಟ್ಟುಕೋ ಎಂದು ಹೇಳಿದ್ದೆ.",
-        "ನೀನು ಎಲ್ಲಿದ್ದೀಯೋ ಸರಿಯಾಗಿ ಹೇಳು.",
-        "ಒಬ್ಬಳೇ ಎಲ್ಲಿಗೂ ಹೋಗಬೇಡ.",
-        "ಸುರಕ್ಷಿತವಾದ ಸಾರ್ವಜನಿಕ ಸ್ಥಳದಲ್ಲಿರು.",
-        "ನಾನು ಬರುತ್ತಿದ್ದೇನೆ. ಫೋನ್ ಇಟ್ಟುಬಿಡಬೇಡ.",
-        "ಯಾವುದೇ ಅಪಾಯ ಇದ್ದರೆ ತಕ್ಷಣ ಸಹಾಯಕ್ಕೆ ಕರೆ ಮಾಡು.",
-        "ನನ್ನ ಮಾತು ಕೇಳು, ಅನಗತ್ಯವಾಗಿ ಅಪಾಯ ತೆಗೆದುಕೊಳ್ಳಬೇಡ."
-    ],
-
-    te: [
-        "ఎక్కడ ఉన్నావు? ఫోన్ ఎత్తు.",
-        "ఫోన్ నీ దగ్గర ఉంచుకోమని చెప్పాను.",
-        "నువ్వు ఎక్కడ ఉన్నావో సరిగ్గా చెప్పు.",
-        "ఒంటరిగా ఎక్కడికీ వెళ్లకు.",
-        "సురక్షితమైన బహిరంగ ప్రదేశంలో ఉండు.",
-        "నేను వస్తున్నాను. ఫోన్ పెట్టవద్దు.",
-        "ప్రమాదం ఉంటే వెంటనే సహాయం కోసం కాల్ చేయి.",
-        "నా మాట విను, అవసరం లేని ప్రమాదం తీసుకోకు."
-    ],
-
-    ta: [
-        "எங்கே இருக்கிறாய்? போனை எடு.",
-        "போனை உன்னுடன் வைத்திருக்கச் சொன்னேன்.",
-        "நீ எங்கே இருக்கிறாய் என்று சரியாக சொல்.",
-        "தனியாக எங்கும் செல்லாதே.",
-        "பாதுகாப்பான பொது இடத்தில் இரு.",
-        "நான் வருகிறேன். போனை வைக்காதே.",
-        "ஆபத்து இருந்தால் உடனே உதவிக்கு அழை.",
-        "என் பேச்சைக் கேள், தேவையில்லாமல் ஆபத்தை எடுத்துக்கொள்ளாதே."
-    ],
-
-    hi: [
-        "तुम कहाँ हो? फोन उठाओ.",
-        "मैंने कहा था फोन अपने पास रखना.",
-        "तुम कहाँ हो, ठीक से बताओ.",
-        "अकेले कहीं मत जाना.",
-        "किसी सुरक्षित सार्वजनिक जगह पर रहो.",
-        "मैं आ रहा हूँ. फोन मत रखना.",
-        "कोई खतरा हो तो तुरंत मदद के लिए कॉल करो.",
-        "मेरी बात ध्यान से सुनो, बेवजह जोखिम मत लेना."
-    ]
-
-};
-
-
-/* =========================================================
-   PAGE LOAD
-   ========================================================= */
-
-window.addEventListener("DOMContentLoaded", () => {
-
-    createContactFields();
-
-    applyLanguage(currentLanguage);
-
-    document.getElementById("languageSelect").value =
-        currentLanguage;
-
-
-    /* Splash */
+window.addEventListener("load", () => {
 
     setTimeout(() => {
 
         document
-            .getElementById("splash")
+            .getElementById("splashScreen")
             .classList.add("hidden");
 
         document
@@ -164,386 +365,244 @@ window.addEventListener("DOMContentLoaded", () => {
 
     }, 3000);
 
-
-    /* Language buttons */
-
-    document
-        .querySelectorAll(".language-btn")
-        .forEach(button => {
-
-            button.addEventListener("click", () => {
-
-                document
-                    .querySelectorAll(".language-btn")
-                    .forEach(btn =>
-                        btn.classList.remove("active")
-                    );
-
-                button.classList.add("active");
-
-                currentLanguage =
-                    button.dataset.lang;
-
-            });
-
-        });
-
-
-    /* Continue */
-
-    document
-        .getElementById("continueBtn")
-        .addEventListener("click", () => {
-
-            localStorage.setItem(
-                STORAGE.language,
-                currentLanguage
-            );
-
-            applyLanguage(currentLanguage);
-
-            document
-                .getElementById("languageScreen")
-                .classList.add("hidden");
-
-            document
-                .getElementById("app")
-                .classList.remove("hidden");
-
-            showPage("home");
-
-        });
-
-
-    /* Language select */
-
-    document
-        .getElementById("languageSelect")
-        .addEventListener("change", event => {
-
-            currentLanguage =
-                event.target.value;
-
-            localStorage.setItem(
-                STORAGE.language,
-                currentLanguage
-            );
-
-            applyLanguage(currentLanguage);
-
-            toast("Language updated.");
-
-        });
-
-
-    /* Menu */
-
-    document
-        .getElementById("menuBtn")
-        .addEventListener("click", () => {
-
-            document
-                .getElementById("sideMenu")
-                .classList.toggle("open");
-
-        });
-
-
-    /* Contacts */
-
-    document
-        .getElementById("saveContacts")
-        .addEventListener(
-            "click",
-            saveContacts
-        );
-
-
-    /* Evidence */
-
-    document
-        .getElementById("cameraBtn")
-        .addEventListener(
-            "click",
-            startCamera
-        );
-
-
-    document
-        .getElementById("photoBtn")
-        .addEventListener(
-            "click",
-            takePhoto
-        );
-
-
-    document
-        .getElementById("recordBtn")
-        .addEventListener(
-            "click",
-            startAudioRecording
-        );
-
-
-    document
-        .getElementById("stopRecordBtn")
-        .addEventListener(
-            "click",
-            stopAudioRecording
-        );
-
-
-    document
-        .getElementById("fileUpload")
-        .addEventListener(
-            "change",
-            uploadFiles
-        );
-
-
-    /* Auto SOS */
-
-    document
-        .getElementById("stopAuto")
-        .addEventListener(
-            "click",
-            stopAutoSOS
-        );
-
-
-    /* Fake call */
-
-    document
-        .getElementById("closeFake")
-        .addEventListener(
-            "click",
-            closeFakeCall
-        );
-
-
-    document
-        .getElementById("answerFake")
-        .addEventListener(
-            "click",
-            answerFakeCall
-        );
-
-
-    document
-        .getElementById("endFake")
-        .addEventListener(
-            "click",
-            closeFakeCall
-        );
-
-
-    /* Emergency overlay */
-
-    document
-        .getElementById("closeEmergency")
-        .addEventListener(
-            "click",
-            () => {
-
-                document
-                    .getElementById("emergencyOverlay")
-                    .classList.add("hidden");
-
-            }
-        );
-
-
-    /* Battery */
-
-    document
-        .getElementById("batteryBtn")
-        .addEventListener(
-            "click",
-            toggleBatterySaver
-        );
-
-
-    /* Customer issue */
-
-    document
-        .getElementById("issueForm")
-        .addEventListener(
-            "submit",
-            saveIssue
-        );
-
-
-    /* Shake */
-
-    setupShakeDetection();
-
-
-    /* Battery information */
-
-    setupBatteryInformation();
-
 });
 
 
-/* =========================================================
-   PAGE NAVIGATION
-   ========================================================= */
+/* =====================================================
+   LANGUAGE SELECTION
+===================================================== */
 
-function showPage(pageID) {
+document
+    .querySelectorAll(".language-option")
+    .forEach(button => {
 
-    document
-        .querySelectorAll(".page")
-        .forEach(page => {
+        button.addEventListener("click", () => {
 
-            page.classList.remove("active");
+            document
+                .querySelectorAll(".language-option")
+                .forEach(btn =>
+                    btn.classList.remove("selected")
+                );
+
+            button.classList.add("selected");
+
+            selectedLanguage =
+                button.dataset.lang;
 
         });
 
-
-    const page =
-        document.getElementById(pageID);
+    });
 
 
-    if (page) {
+document
+    .getElementById("continueLanguage")
+    .addEventListener("click", () => {
 
-        page.classList.add("active");
+        applyLanguage();
 
-    }
+        document
+            .getElementById("languageScreen")
+            .classList.add("hidden");
 
+        document
+            .getElementById("app")
+            .classList.remove("hidden");
+
+    });
+
+
+document
+    .getElementById("languageSelect")
+    .addEventListener("change", function () {
+
+        selectedLanguage = this.value;
+
+        applyLanguage();
+
+    });
+
+
+/* =====================================================
+   LANGUAGE APPLICATION
+===================================================== */
+
+function applyLanguage() {
+
+    const t = translations[selectedLanguage];
 
     document
-        .getElementById("sideMenu")
-        .classList.remove("open");
+        .getElementById("brandTagline")
+        .textContent = t.tagline;
 
+    document
+        .getElementById("languageTitle")
+        .textContent = t.choose;
+
+    document
+        .getElementById("languageSubtitle")
+        .textContent = t.select;
+
+    document
+        .getElementById("continueLanguage")
+        .textContent = t.continue;
+
+    document
+        .getElementById("homeTitle")
+        .innerHTML = t.homeTitle;
+
+    document
+        .getElementById("homeDescription")
+        .textContent = t.homeDescription;
+
+    document
+        .getElementById("emergencyHomeTitle")
+        .textContent = t.emergency;
+
+    document
+        .getElementById("emergencyHomeText")
+        .textContent = t.emergencyText;
+
+    document
+        .getElementById("safetyHomeTitle")
+        .textContent = t.safety;
+
+    document
+        .getElementById("safetyHomeText")
+        .textContent = t.safetyText;
+
+    document
+        .querySelector(".emergency-choice strong")
+        .textContent = t.activate;
+
+    document
+        .querySelector(".safety-choice strong")
+        .textContent = t.openSafety;
+
+}
+
+
+/* =====================================================
+   PAGE NAVIGATION
+===================================================== */
+
+function showPage(page) {
+
+    document
+        .querySelectorAll(".page")
+        .forEach(p => p.classList.remove("active"));
+
+    document
+        .getElementById(page)
+        .classList.add("active");
 
     window.scrollTo({
         top: 0,
-        behavior: "instant"
+        behavior: "smooth"
     });
 
 }
 
 
-/* =========================================================
-   LANGUAGE
-   ========================================================= */
+/* =====================================================
+   EMERGENCY SOS
+   IMMEDIATE ACTION
+===================================================== */
 
-function applyLanguage(language) {
-
-    const data =
-        translations[language] ||
-        translations.en;
+document
+    .getElementById("emergencyHomeButton")
+    .addEventListener("click", activateEmergencySOS);
 
 
-    document.documentElement.lang =
-        language;
-
+async function activateEmergencySOS() {
 
     document
-        .querySelectorAll("[data-i18n]")
-        .forEach(element => {
-
-            const key =
-                element.dataset.i18n;
-
-            if (data[key]) {
-
-                element.textContent =
-                    data[key];
-
-            }
-
-        });
-
+        .getElementById("sosOverlay")
+        .classList.remove("hidden");
 
     document
-        .querySelectorAll(".language-btn")
-        .forEach(button => {
+        .getElementById("sosMessage")
+        .textContent =
+        "Emergency action is being activated.";
 
-            button.classList.toggle(
-                "active",
-                button.dataset.lang === language
-            );
+    await getAndShareLocation(true);
 
-        });
+    playSiren();
+
+    /* Emergency call link */
+
+    setTimeout(() => {
+
+        window.location.href = "tel:112";
+
+    }, 500);
 
 }
 
 
-/* =========================================================
-   TOAST
-   ========================================================= */
+/* =====================================================
+   STOP SOS
+===================================================== */
 
-let toastTimeout;
-
-
-function toast(message) {
-
-    const element =
-        document.getElementById("toast");
+document
+    .getElementById("stopSos")
+    .addEventListener("click", stopSOS);
 
 
-    element.textContent =
-        message;
+function stopSOS() {
 
+    stopSiren();
 
-    element.classList.add("show");
-
-
-    clearTimeout(toastTimeout);
-
-
-    toastTimeout =
-        setTimeout(() => {
-
-            element.classList.remove("show");
-
-        }, 3000);
+    document
+        .getElementById("sosOverlay")
+        .classList.add("hidden");
 
 }
 
 
-/* =========================================================
+/* =====================================================
    LOCATION
-   ========================================================= */
+===================================================== */
 
-function getCurrentLocation() {
+function getLocation() {
 
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
 
         if (!navigator.geolocation) {
 
             reject(
                 new Error(
-                    "Geolocation not supported."
+                    "Location is not supported."
                 )
             );
 
             return;
-
         }
-
 
         navigator.geolocation.getCurrentPosition(
 
             position => {
 
-                resolve(
-                    position.coords
-                );
+                resolve({
+
+                    latitude:
+                        position.coords.latitude,
+
+                    longitude:
+                        position.coords.longitude
+
+                });
 
             },
 
-            error => {
-
-                reject(error);
-
-            },
+            error => reject(error),
 
             {
                 enableHighAccuracy: true,
-                timeout: 7000,
+
+                timeout: 10000,
+
                 maximumAge: 0
+
             }
 
         );
@@ -553,71 +612,73 @@ function getCurrentLocation() {
 }
 
 
-async function shareLocation(silent = false) {
+async function getAndShareLocation(emergency = false) {
+
+    const status =
+        document.getElementById(
+            "sosLocationStatus"
+        );
 
     try {
 
-        const coordinates =
-            await getCurrentLocation();
+        status.textContent =
+            "Getting your location...";
 
+        const location =
+            await getLocation();
 
-        const mapURL =
-            `https://www.google.com/maps?q=${coordinates.latitude},${coordinates.longitude}`;
+        const mapsURL =
+            `https://www.google.com/maps?q=${location.latitude},${location.longitude}`;
 
+        status.textContent =
+            "Location ready.";
 
-        const message =
-            `SHE-SHIELD Emergency Location: ${mapURL}`;
-
+        /* Web Share */
 
         if (navigator.share) {
 
-            await navigator.share({
+            try {
 
-                title:
-                    "SHE-SHIELD Location",
+                await navigator.share({
 
-                text:
-                    message,
+                    title: "SHE-SHIELD Emergency Location",
 
-                url:
-                    mapURL
+                    text:
+                        "My current location. Please help me.",
+                    
+                    url: mapsURL
 
-            });
+                });
 
-        }
+            } catch (shareError) {
 
-        else {
+                console.log(
+                    "Share cancelled."
+                );
 
-            await navigator
-                .clipboard
-                ?.writeText(message);
+            }
+
+        } else {
+
+            await navigator.clipboard?.writeText(
+                mapsURL
+            );
 
             window.open(
-                mapURL,
+                mapsURL,
                 "_blank"
             );
 
         }
 
+        return location;
 
-        if (!silent) {
+    } catch (error) {
 
-            toast(
-                "Location shared successfully."
-            );
+        status.textContent =
+            "Unable to access location. Please enable location permission.";
 
-        }
-
-
-        return mapURL;
-
-    }
-
-    catch {
-
-        toast(
-            "Please allow location permission."
-        );
+        console.error(error);
 
         return null;
 
@@ -626,512 +687,20 @@ async function shareLocation(silent = false) {
 }
 
 
-/* =========================================================
-   EMERGENCY SOS
-   ========================================================= */
-
-async function emergencySOS() {
-
-    /*
-       IMPORTANT:
-       Emergency SOS does NOT open another menu.
-       It immediately starts the emergency process.
-    */
-
-
-    document
-        .getElementById("emergencyOverlay")
-        .classList.remove("hidden");
-
-
-    document
-        .getElementById("emergencyStatus")
-        .textContent =
-        "Getting location and starting emergency action...";
-
-
-    stopAutoSOS();
-    stopVoiceSOS();
-
-
-    let locationURL = null;
-
-
-    try {
-
-        const coordinates =
-            await getCurrentLocation();
-
-
-        locationURL =
-            `https://www.google.com/maps?q=${coordinates.latitude},${coordinates.longitude}`;
-
-    }
-
-    catch {
-
-        console.log(
-            "Location permission unavailable."
-        );
-
-    }
-
-
-    /*
-       Share location if browser allows.
-    */
-
-    if (
-        locationURL &&
-        navigator.share
-    ) {
-
-        try {
-
-            await navigator.share({
-
-                title:
-                    "SHE-SHIELD Emergency SOS",
-
-                text:
-                    `Emergency SOS activated. Please help. My location: ${locationURL}`,
-
-                url:
-                    locationURL
-
-            });
-
-        }
-
-        catch {
-
-            console.log(
-                "Share cancelled."
-            );
-
-        }
-
-    }
-
-
-    document
-        .getElementById("emergencyStatus")
-        .textContent =
-        "Emergency action started. Opening emergency call...";
-
-
-    /*
-       Open Indian emergency number.
-    */
-
-    setTimeout(() => {
-
-        window.location.href =
-            "tel:112";
-
-    },150);
-
-}
-
-
-/* =========================================================
-   SILENT SOS
-   ========================================================= */
-
-async function silentSOS() {
-
-    toast(
-        "Silent SOS activated. No siren or flashlight."
-    );
-
-
-    await shareLocation(true);
-
-}
-
-
-/* =========================================================
-   AUTO SOS
-   ========================================================= */
-
-function startAutoSOS() {
-
-    stopAutoSOS();
-
-
-    autoSeconds = 10;
-
-
-    document
-        .getElementById("countdown")
-        .textContent =
-        autoSeconds;
-
-
-    document
-        .getElementById("autoModal")
-        .classList.remove("hidden");
-
-
-    autoTimer =
-        setInterval(() => {
-
-            autoSeconds--;
-
-
-            document
-                .getElementById("countdown")
-                .textContent =
-                autoSeconds;
-
-
-            if (autoSeconds <= 0) {
-
-                stopAutoSOS(true);
-
-                emergencySOS();
-
-            }
-
-        },1000);
-
-}
-
-
-function stopAutoSOS(triggered = false) {
-
-    if (autoTimer) {
-
-        clearInterval(autoTimer);
-
-        autoTimer = null;
-
-    }
-
-
-    document
-        .getElementById("autoModal")
-        .classList.add("hidden");
-
-
-    if (!triggered) {
-
-        autoSeconds = 10;
-
-    }
-
-}
-
-
-/* =========================================================
-   VOICE SOS
-   ========================================================= */
-
-function startVoiceSOS() {
-
-    const Recognition =
-        window.SpeechRecognition ||
-        window.webkitSpeechRecognition;
-
-
-    if (!Recognition) {
-
-        toast(
-            "Voice recognition is not supported in this browser."
-        );
-
-        return;
-
-    }
-
-
-    if (voiceListening) {
-
-        stopVoiceSOS();
-
-        toast(
-            "Voice SOS stopped."
-        );
-
-        return;
-
-    }
-
-
-    voiceRecognition =
-        new Recognition();
-
-
-    voiceRecognition.continuous =
-        true;
-
-
-    voiceRecognition.interimResults =
-        true;
-
-
-    voiceRecognition.lang =
-        getSpeechLanguage(
-            currentLanguage
-        );
-
-
-    voiceListening = true;
-
-
-    toast(
-        'Voice SOS active. Say "PHONE" to trigger SOS. Tap again to stop.'
-    );
-
-
-    voiceRecognition.onresult =
-        event => {
-
-            let text = "";
-
-
-            for (
-                let i = event.resultIndex;
-                i < event.results.length;
-                i++
-            ) {
-
-                text +=
-                    event.results[i][0].transcript;
-
-            }
-
-
-            if (
-                /\bphone\b/i.test(text) ||
-                /ಫೋನ್/i.test(text) ||
-                /ఫోన్/i.test(text) ||
-                /போன்/i.test(text) ||
-                /फोन/i.test(text)
-            ) {
-
-                stopVoiceSOS();
-
-                emergencySOS();
-
-            }
-
-        };
-
-
-    voiceRecognition.onerror =
-        () => {
-
-            voiceListening = false;
-
-            toast(
-                "Voice SOS stopped."
-            );
-
-        };
-
-
-    voiceRecognition.onend =
-        () => {
-
-            if (voiceListening) {
-
-                try {
-
-                    voiceRecognition.start();
-
-                }
-
-                catch {}
-
-            }
-
-        };
-
-
-    try {
-
-        voiceRecognition.start();
-
-    }
-
-    catch {
-
-        voiceListening = false;
-
-    }
-
-}
-
-
-function stopVoiceSOS() {
-
-    voiceListening = false;
-
-
-    if (voiceRecognition) {
-
-        try {
-
-            voiceRecognition.stop();
-
-        }
-
-        catch {}
-
-    }
-
-
-    voiceRecognition = null;
-
-}
-
-
-/* =========================================================
-   SHAKE SOS
-   ========================================================= */
-
-function setupShakeDetection() {
-
-    window.addEventListener(
-        "devicemotion",
-        event => {
-
-            if (!shakeEnabled) {
-
-                return;
-
-            }
-
-
-            const acceleration =
-                event.accelerationIncludingGravity;
-
-
-            if (!acceleration) {
-
-                return;
-
-            }
-
-
-            const force =
-                Math.sqrt(
-                    Math.pow(acceleration.x || 0,2) +
-                    Math.pow(acceleration.y || 0,2) +
-                    Math.pow(acceleration.z || 0,2)
-                );
-
-
-            const now =
-                Date.now();
-
-
-            if (
-                force > 22 &&
-                now - lastShake > 1500
-            ) {
-
-                lastShake = now;
-
-                shakeEnabled = false;
-
-                toast(
-                    "Shake SOS triggered."
-                );
-
-
-                playSiren();
-
-
-                shareLocation();
-
-            }
-
-        }
-    );
-
-}
-
-
-async function enableShakeSOS() {
-
-    /*
-       iPhone/iPad requires permission
-       after a button click.
-    */
-
-    if (
-        typeof DeviceMotionEvent !==
-        "undefined" &&
-
-        typeof DeviceMotionEvent
-            .requestPermission ===
-            "function"
-    ) {
-
-        try {
-
-            const permission =
-                await DeviceMotionEvent
-                    .requestPermission();
-
-
-            if (
-                permission !==
-                "granted"
-            ) {
-
-                toast(
-                    "Motion permission denied."
-                );
-
-                return;
-
-            }
-
-        }
-
-        catch {
-
-            toast(
-                "Motion permission unavailable."
-            );
-
-            return;
-
-        }
-
-    }
-
-
-    shakeEnabled =
-        !shakeEnabled;
-
-
-    toast(
-        shakeEnabled
-            ? "Shake SOS armed. Shake your phone."
-            : "Shake SOS stopped."
-    );
-
-}
-
-
-/* =========================================================
+/* =====================================================
    SIREN
-   ========================================================= */
+===================================================== */
 
 function playSiren() {
 
-    siren.currentTime = 0;
+    sirenAudio.currentTime = 0;
 
+    sirenAudio.play()
+        .catch(error => {
 
-    siren.play()
-        .catch(() => {
-
-            toast(
-                "Tap Siren once to allow audio."
+            console.log(
+                "Siren needs user interaction:",
+                error
             );
 
         });
@@ -1141,377 +710,855 @@ function playSiren() {
 
 function stopSiren() {
 
-    siren.pause();
+    sirenAudio.pause();
 
-    siren.currentTime = 0;
-
-}
-
-
-function toggleSiren() {
-
-    if (siren.paused) {
-
-        playSiren();
-
-    }
-
-    else {
-
-        stopSiren();
-
-    }
+    sirenAudio.currentTime = 0;
 
 }
 
 
-/* =========================================================
-   FAKE CALL
-   ========================================================= */
+/* =====================================================
+   IMMEDIATE SAFETY
+===================================================== */
 
-function openFakeCall() {
+document
+    .getElementById("immediateSafetyButton")
+    .addEventListener("click", () => {
 
-    /*
-       IMPORTANT:
-       Fake call uses Speech Synthesis.
-       It does NOT use siren.mp3.
-    */
+        showPage("safetyPage");
 
-    stopSiren();
+    });
 
 
-    document
-        .getElementById("fakeModal")
-        .classList.remove("hidden");
+document
+    .getElementById("backHomeFromSafety")
+    .addEventListener("click", () => {
+
+        showPage("homePage");
+
+    });
 
 
-    document
-        .getElementById("fakeStatus")
-        .textContent =
-        "Incoming call...";
+/* =====================================================
+   SAFETY CARDS
+===================================================== */
 
-}
+document
+    .querySelectorAll(".safety-card")
+    .forEach(card => {
 
+        card.addEventListener("click", () => {
 
-function closeFakeCall() {
-
-    fakeCallPlaying = false;
-
-
-    if (
-        "speechSynthesis" in window
-    ) {
-
-        speechSynthesis.cancel();
-
-    }
-
-
-    document
-        .getElementById("fakeModal")
-        .classList.add("hidden");
-
-
-    document
-        .getElementById("fakeStatus")
-        .textContent =
-        "Calling...";
-
-}
-
-
-function answerFakeCall() {
-
-    if (
-        !("speechSynthesis" in window)
-    ) {
-
-        toast(
-            "Speech synthesis is not supported."
-        );
-
-        return;
-
-    }
-
-
-    if (fakeCallPlaying) {
-
-        return;
-
-    }
-
-
-    fakeCallPlaying = true;
-
-
-    document
-        .getElementById("fakeStatus")
-        .textContent =
-        "Dad is speaking...";
-
-
-    const lines =
-        fatherScripts[currentLanguage] ||
-        fatherScripts.en;
-
-
-    speakFatherLines(lines,0);
-
-}
-
-
-function speakFatherLines(lines,index) {
-
-    if (
-        !fakeCallPlaying ||
-        index >= lines.length
-    ) {
-
-        fakeCallPlaying = false;
-
-        document
-            .getElementById("fakeStatus")
-            .textContent =
-            "Call ended.";
-
-        return;
-
-    }
-
-
-    const speech =
-        new SpeechSynthesisUtterance(
-            lines[index]
-        );
-
-
-    speech.lang =
-        getSpeechLanguage(
-            currentLanguage
-        );
-
-
-    /*
-       Lower pitch and slower speed
-       gives a deeper, stricter voice.
-    */
-
-    speech.rate = .82;
-
-    speech.pitch = .72;
-
-    speech.volume = 1;
-
-
-    speech.onend = () => {
-
-        setTimeout(() => {
-
-            speakFatherLines(
-                lines,
-                index + 1
+            openTool(
+                card.dataset.tool
             );
 
-        },650);
+        });
 
-    };
-
-
-    speech.onerror = () => {
-
-        fakeCallPlaying = false;
-
-    };
+    });
 
 
-    speechSynthesis.speak(
-        speech
-    );
+/* =====================================================
+   TOOL SYSTEM
+===================================================== */
 
-}
+function openTool(tool) {
 
+    switch (tool) {
 
-/* =========================================================
-   SPEECH LANGUAGE
-   ========================================================= */
+        case "contacts":
+            openContacts();
+            break;
 
-function getSpeechLanguage(language) {
+        case "silent":
+            openSilentSOS();
+            break;
 
-    const languages = {
+        case "voice":
+            openVoiceSOS();
+            break;
 
-        en: "en-IN",
-        kn: "kn-IN",
-        te: "te-IN",
-        ta: "ta-IN",
-        hi: "hi-IN"
+        case "shake":
+            openShakeSOS();
+            break;
 
-    };
+        case "auto":
+            openAutoSOS();
+            break;
 
+        case "evidence":
+            openEvidence();
+            break;
 
-    return languages[language] || "en-IN";
+        case "fakecall":
+            openFakeCall();
+            break;
 
-}
+        case "tips":
+            openTips();
+            break;
 
+        case "helplines":
+            openHelplines();
+            break;
 
-/* =========================================================
-   TRUSTED CONTACTS
-   ========================================================= */
+        case "battery":
+            openBatterySaver();
+            break;
 
-function createContactFields() {
-
-    const container =
-        document.getElementById(
-            "contactFields"
-        );
-
-
-    const saved =
-        JSON.parse(
-            localStorage.getItem(
-                STORAGE.contacts
-            ) || "[]"
-        );
-
-
-    container.innerHTML = "";
-
-
-    for (
-        let i = 0;
-        i < 5;
-        i++
-    ) {
-
-        const contact =
-            saved[i] || {};
-
-
-        const row =
-            document.createElement("div");
-
-
-        row.className =
-            "contact-row";
-
-
-        row.innerHTML = `
-
-            <input
-                class="contact-name"
-                placeholder="Contact ${i+1} Name"
-                value="${escapeHTML(contact.name || "")}"
-            >
-
-            <input
-                class="contact-phone"
-                type="tel"
-                placeholder="Contact ${i+1} Phone"
-                value="${escapeHTML(contact.phone || "")}"
-            >
-
-        `;
-
-
-        container.appendChild(row);
+        case "issues":
+            openCustomerIssues();
+            break;
 
     }
+
+}
+
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+function openModal(content) {
+
+    document
+        .getElementById("modalContent")
+        .innerHTML = content;
+
+    document
+        .getElementById("modal")
+        .classList.remove("hidden");
+
+}
+
+
+function closeModal() {
+
+    document
+        .getElementById("modal")
+        .classList.add("hidden");
+
+}
+
+
+document
+    .getElementById("closeModal")
+    .addEventListener("click", closeModal);
+
+
+document
+    .getElementById("modal")
+    .addEventListener("click", event => {
+
+        if (
+            event.target.id === "modal"
+        ) {
+
+            closeModal();
+
+        }
+
+    });
+
+
+/* =====================================================
+   TRUSTED CONTACTS
+===================================================== */
+
+function openContacts() {
+
+    let html = `
+
+        <h2 class="modal-title">
+            Trusted Contacts
+        </h2>
+
+        <p class="modal-subtitle">
+            Add a minimum of five trusted contacts.
+        </p>
+
+        <div class="form-grid">
+    `;
+
+    for (let i = 0; i < 5; i++) {
+
+        const contact =
+            contacts[i] || {};
+
+        html += `
+
+            <div class="contact-row">
+
+                <input
+                    id="contactName${i}"
+                    type="text"
+                    placeholder="Contact ${i + 1} Name"
+                    value="${escapeHTML(
+                        contact.name || ""
+                    )}"
+                >
+
+                <input
+                    id="contactPhone${i}"
+                    type="tel"
+                    placeholder="Contact ${i + 1} Phone"
+                    value="${escapeHTML(
+                        contact.phone || ""
+                    )}"
+                >
+
+            </div>
+        `;
+
+    }
+
+    html += `
+
+            <button
+                id="saveContactsButton"
+                class="form-button"
+            >
+                Save Contacts
+            </button>
+
+            <div
+                id="contactStatus"
+                class="contact-status"
+            ></div>
+
+        </div>
+
+    `;
+
+    openModal(html);
+
+
+    document
+        .getElementById("saveContactsButton")
+        .addEventListener(
+            "click",
+            saveContacts
+        );
 
 }
 
 
 function saveContacts() {
 
-    const names =
-        document.querySelectorAll(
-            ".contact-name"
-        );
+    contacts = [];
 
+    for (let i = 0; i < 5; i++) {
 
-    const phones =
-        document.querySelectorAll(
-            ".contact-phone"
-        );
+        const name =
+            document
+                .getElementById(
+                    `contactName${i}`
+                )
+                .value
+                .trim();
 
+        const phone =
+            document
+                .getElementById(
+                    `contactPhone${i}`
+                )
+                .value
+                .trim();
 
-    const contacts = [];
+        if (name && phone) {
 
+            contacts.push({
+                name,
+                phone
+            });
 
-    for (
-        let i = 0;
-        i < 5;
-        i++
-    ) {
-
-        contacts.push({
-
-            name:
-                names[i].value.trim(),
-
-            phone:
-                phones[i].value.trim()
-
-        });
+        }
 
     }
 
-
-    const complete =
-        contacts.filter(
-            contact =>
-                contact.name &&
-                contact.phone
-        );
-
-
-    if (
-        complete.length < 5
-    ) {
+    if (contacts.length < 5) {
 
         document
-            .getElementById(
-                "contactStatus"
-            )
+            .getElementById("contactStatus")
             .textContent =
-            "Please fill all five trusted contacts.";
+            "Please enter all five trusted contacts.";
 
         return;
 
     }
 
-
     localStorage.setItem(
-        STORAGE.contacts,
+        "sheShieldContacts",
         JSON.stringify(contacts)
     );
 
-
     document
-        .getElementById(
-            "contactStatus"
-        )
+        .getElementById("contactStatus")
         .textContent =
-        "Five trusted contacts saved.";
-
-
-    toast(
-        "Trusted contacts saved."
-    );
+        "✓ Five trusted contacts saved successfully.";
 
 }
 
 
-/* =========================================================
-   CAMERA
-   ========================================================= */
+/* =====================================================
+   SILENT SOS
+===================================================== */
 
-async function startCamera() {
+function openSilentSOS() {
+
+    openModal(`
+
+        <h2 class="modal-title">
+            Silent SOS
+        </h2>
+
+        <p class="modal-subtitle">
+            Share your location without siren or screen flash.
+        </p>
+
+        <button
+            id="silentSOSAction"
+            class="action-button"
+        >
+            📍 SHARE LOCATION SILENTLY
+        </button>
+
+        <p
+            id="silentStatus"
+            class="contact-status"
+        >
+            Ready
+        </p>
+
+    `);
+
+
+    document
+        .getElementById("silentSOSAction")
+        .addEventListener(
+            "click",
+            async () => {
+
+                document
+                    .getElementById(
+                        "silentStatus"
+                    )
+                    .textContent =
+                    "Getting location...";
+
+                await getAndShareLocation();
+
+                document
+                    .getElementById(
+                        "silentStatus"
+                    )
+                    .textContent =
+                    "Location sharing completed.";
+
+            }
+        );
+
+}
+
+
+/* =====================================================
+   VOICE SOS
+===================================================== */
+
+function openVoiceSOS() {
+
+    openModal(`
+
+        <h2 class="modal-title">
+            Voice SOS
+        </h2>
+
+        <p class="modal-subtitle">
+            Say <strong>"PHONE"</strong> to trigger SOS.
+        </p>
+
+        <button
+            id="startVoiceSOS"
+            class="action-button"
+        >
+            🎙 START VOICE SOS
+        </button>
+
+        <button
+            id="stopVoiceSOS"
+            class="action-button red"
+        >
+            STOP VOICE SOS
+        </button>
+
+        <p
+            id="voiceStatus"
+            class="contact-status"
+        >
+            Voice SOS is stopped.
+        </p>
+
+    `);
+
+
+    document
+        .getElementById("startVoiceSOS")
+        .addEventListener(
+            "click",
+            startVoiceSOS
+        );
+
+    document
+        .getElementById("stopVoiceSOS")
+        .addEventListener(
+            "click",
+            stopVoiceSOS
+        );
+
+}
+
+
+function startVoiceSOS() {
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+
+        document
+            .getElementById("voiceStatus")
+            .textContent =
+            "Voice recognition is not supported in this browser.";
+
+        return;
+
+    }
+
+    voiceRecognition =
+        new SpeechRecognition();
+
+    voiceRecognition.continuous = true;
+
+    voiceRecognition.interimResults = true;
+
+    voiceRecognition.lang =
+        speechLanguage(selectedLanguage);
+
+    voiceRecognition.onstart = () => {
+
+        voiceListening = true;
+
+        document
+            .getElementById("voiceStatus")
+            .textContent =
+            'Listening... Say "PHONE".';
+
+    };
+
+
+    voiceRecognition.onresult = event => {
+
+        let text = "";
+
+        for (
+            let i = event.resultIndex;
+            i < event.results.length;
+            i++
+        ) {
+
+            text +=
+                event.results[i][0].transcript
+                + " ";
+
+        }
+
+        text = text.toLowerCase();
+
+        if (
+            text.includes("phone") ||
+            text.includes("फोन") ||
+            text.includes("ಫೋನ್")
+        ) {
+
+            voiceRecognition.stop();
+
+            activateEmergencySOS();
+
+        }
+
+    };
+
+
+    voiceRecognition.onerror = event => {
+
+        document
+            .getElementById("voiceStatus")
+            .textContent =
+            "Voice recognition error: "
+            + event.error;
+
+    };
+
+
+    voiceRecognition.start();
+
+}
+
+
+function stopVoiceSOS() {
+
+    if (voiceRecognition) {
+
+        voiceRecognition.stop();
+
+    }
+
+    voiceListening = false;
+
+}
+
+
+function speechLanguage(lang) {
+
+    const map = {
+
+        en: "en-IN",
+
+        kn: "kn-IN",
+
+        te: "te-IN",
+
+        ta: "ta-IN",
+
+        hi: "hi-IN"
+
+    };
+
+    return map[lang] || "en-IN";
+
+}
+
+
+/* =====================================================
+   SHAKE SOS
+===================================================== */
+
+function openShakeSOS() {
+
+    openModal(`
+
+        <h2 class="modal-title">
+            Shake SOS
+        </h2>
+
+        <p class="modal-subtitle">
+            Shake your phone to trigger SOS.
+        </p>
+
+        <button
+            id="enableShake"
+            class="action-button"
+        >
+            📳 ENABLE SHAKE SOS
+        </button>
+
+        <p
+            id="shakeStatus"
+            class="contact-status"
+        >
+            Shake detection is off.
+        </p>
+
+    `);
+
+
+    document
+        .getElementById("enableShake")
+        .addEventListener(
+            "click",
+            enableShakeDetection
+        );
+
+}
+
+
+async function enableShakeDetection() {
+
+    /* iPhone permission */
+
+    if (
+        typeof DeviceMotionEvent !==
+        "undefined" &&
+        typeof DeviceMotionEvent.requestPermission ===
+        "function"
+    ) {
+
+        try {
+
+            const permission =
+                await DeviceMotionEvent
+                    .requestPermission();
+
+            if (permission !== "granted") {
+
+                return;
+
+            }
+
+        } catch (error) {
+
+            console.log(error);
+
+        }
+
+    }
+
+    window.addEventListener(
+        "devicemotion",
+        detectShake
+    );
+
+    document
+        .getElementById("shakeStatus")
+        .textContent =
+        "✓ Shake SOS is active. Shake your phone.";
+
+}
+
+
+function detectShake(event) {
+
+    const acceleration =
+        event.accelerationIncludingGravity;
+
+    if (!acceleration) return;
+
+    const magnitude =
+        Math.sqrt(
+
+            Math.pow(
+                acceleration.x || 0,
+                2
+            ) +
+
+            Math.pow(
+                acceleration.y || 0,
+                2
+            ) +
+
+            Math.pow(
+                acceleration.z || 0,
+                2
+            )
+
+        );
+
+    const now =
+        Date.now();
+
+    if (
+        magnitude > 25 &&
+        now - shakeLastTime > 1500
+    ) {
+
+        shakeLastTime = now;
+
+        activateEmergencySOS();
+
+    }
+
+}
+
+
+/* =====================================================
+   AUTO SOS
+===================================================== */
+
+function openAutoSOS() {
+
+    openModal(`
+
+        <h2 class="modal-title">
+            Auto SOS
+        </h2>
+
+        <p class="modal-subtitle">
+            Start a 10-second countdown.
+            Stop it before SOS activates.
+        </p>
+
+        <button
+            id="startAutoSOS"
+            class="action-button"
+        >
+            ⏱ START 10-SECOND COUNTDOWN
+        </button>
+
+    `);
+
+
+    document
+        .getElementById("startAutoSOS")
+        .addEventListener(
+            "click",
+            startAutoSOS
+        );
+
+}
+
+
+function startAutoSOS() {
+
+    closeModal();
+
+    document
+        .getElementById(
+            "countdownOverlay"
+        )
+        .classList.remove("hidden");
+
+    let seconds = 10;
+
+    document
+        .getElementById(
+            "countdownNumber"
+        )
+        .textContent = seconds;
+
+
+    autoTimer =
+        setInterval(() => {
+
+            seconds--;
+
+            document
+                .getElementById(
+                    "countdownNumber"
+                )
+                .textContent =
+                seconds;
+
+            if (seconds <= 0) {
+
+                clearInterval(autoTimer);
+
+                document
+                    .getElementById(
+                        "countdownOverlay"
+                    )
+                    .classList.add("hidden");
+
+                activateEmergencySOS();
+
+            }
+
+        }, 1000);
+
+}
+
+
+document
+    .getElementById("cancelCountdown")
+    .addEventListener(
+        "click",
+        () => {
+
+            clearInterval(autoTimer);
+
+            document
+                .getElementById(
+                    "countdownOverlay"
+                )
+                .classList.add("hidden");
+
+        }
+    );
+
+
+/* =====================================================
+   CAPTURE EVIDENCE
+===================================================== */
+
+function openEvidence() {
+
+    openModal(`
+
+        <h2 class="modal-title">
+            Capture Evidence
+        </h2>
+
+        <p class="modal-subtitle">
+            Capture photos, videos, audio or upload recent files.
+        </p>
+
+        <button
+            id="cameraButton"
+            class="action-button"
+        >
+            📷 OPEN CAMERA
+        </button>
+
+        <button
+            id="audioButton"
+            class="action-button"
+        >
+            🎙 RECORD AUDIO
+        </button>
+
+        <label
+            class="action-button"
+            style="display:block;text-align:center"
+        >
+            📁 UPLOAD RECENT FILES
+
+            <input
+                id="evidenceFiles"
+                type="file"
+                accept="image/*,video/*,audio/*"
+                multiple
+                hidden
+            >
+
+        </label>
+
+        <div id="evidenceResult"></div>
+
+    `);
+
+
+    document
+        .getElementById("cameraButton")
+        .addEventListener(
+            "click",
+            openCamera
+        );
+
+
+    document
+        .getElementById("audioButton")
+        .addEventListener(
+            "click",
+            recordAudio
+        );
+
+
+    document
+        .getElementById("evidenceFiles")
+        .addEventListener(
+            "change",
+            handleEvidenceFiles
+        );
+
+}
+
+
+async function openCamera() {
 
     try {
 
-        cameraStream =
-            await navigator
-                .mediaDevices
+        const stream =
+            await navigator.mediaDevices
                 .getUserMedia({
 
                     video: true,
@@ -1520,195 +1567,193 @@ async function startCamera() {
 
                 });
 
+        const video =
+            document.createElement("video");
+
+        video.srcObject = stream;
+
+        video.autoplay = true;
+
+        video.controls = true;
+
+        video.style.width = "100%";
+
+        video.style.borderRadius = "15px";
 
         document
             .getElementById(
-                "cameraPreview"
+                "evidenceResult"
             )
-            .srcObject =
-            cameraStream;
+            .appendChild(video);
 
 
-        toast(
-            "Camera and microphone enabled."
-        );
+        const capture =
+            document.createElement("button");
 
-    }
+        capture.className =
+            "action-button gold";
 
-    catch {
+        capture.textContent =
+            "📸 TAKE PHOTO";
 
-        toast(
-            "Camera/microphone permission denied."
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   PHOTO
-   ========================================================= */
-
-function takePhoto() {
-
-    const video =
-        document.getElementById(
-            "cameraPreview"
-        );
+        document
+            .getElementById(
+                "evidenceResult"
+            )
+            .appendChild(capture);
 
 
-    if (!video.srcObject) {
+        capture.onclick = () => {
 
-        toast(
-            "Start the camera first."
-        );
-
-        return;
-
-    }
-
-
-    const canvas =
-        document.getElementById(
-            "photoCanvas"
-        );
-
-
-    canvas.width =
-        video.videoWidth || 1280;
-
-
-    canvas.height =
-        video.videoHeight || 720;
-
-
-    const context =
-        canvas.getContext("2d");
-
-
-    context.drawImage(
-        video,
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-
-    canvas.toBlob(blob => {
-
-        const url =
-            URL.createObjectURL(blob);
-
-
-        addEvidence(
-            "Captured Photo",
-            url
-        );
-
-    },"image/jpeg",.92);
-
-}
-
-
-/* =========================================================
-   AUDIO RECORDING
-   ========================================================= */
-
-function startAudioRecording() {
-
-    if (!cameraStream) {
-
-        toast(
-            "Start Camera first."
-        );
-
-        return;
-
-    }
-
-
-    if (!window.MediaRecorder) {
-
-        toast(
-            "Audio recording unavailable."
-        );
-
-        return;
-
-    }
-
-
-    recordedChunks = [];
-
-
-    mediaRecorder =
-        new MediaRecorder(
-            cameraStream
-        );
-
-
-    mediaRecorder.ondataavailable =
-        event => {
-
-            if (
-                event.data.size
-            ) {
-
-                recordedChunks.push(
-                    event.data
+            const canvas =
+                document.createElement(
+                    "canvas"
                 );
 
-            }
+            canvas.width =
+                video.videoWidth;
+
+            canvas.height =
+                video.videoHeight;
+
+            canvas
+                .getContext("2d")
+                .drawImage(
+                    video,
+                    0,
+                    0
+                );
+
+            const image =
+                document.createElement(
+                    "img"
+                );
+
+            image.src =
+                canvas.toDataURL(
+                    "image/png"
+                );
+
+            image.style.width =
+                "100%";
+
+            image.style.marginTop =
+                "15px";
+
+            image.style.borderRadius =
+                "15px";
+
+            document
+                .getElementById(
+                    "evidenceResult"
+                )
+                .appendChild(image);
 
         };
 
 
-    mediaRecorder.onstop =
-        () => {
+    } catch (error) {
+
+        alert(
+            "Camera permission was denied or unavailable."
+        );
+
+    }
+
+}
+
+
+async function recordAudio() {
+
+    if (
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia
+    ) {
+
+        alert(
+            "Audio recording is not supported."
+        );
+
+        return;
+
+    }
+
+    try {
+
+        const stream =
+            await navigator.mediaDevices
+                .getUserMedia({
+                    audio: true
+                });
+
+        const recorder =
+            new MediaRecorder(stream);
+
+        const chunks = [];
+
+        recorder.ondataavailable =
+            event => {
+
+                chunks.push(
+                    event.data
+                );
+
+            };
+
+
+        recorder.onstop = () => {
 
             const blob =
                 new Blob(
-                    recordedChunks,
+                    chunks,
                     {
                         type:
                             "audio/webm"
                     }
                 );
 
+            const url =
+                URL.createObjectURL(
+                    blob
+                );
 
-            addEvidence(
-                "Recorded Audio",
-                URL.createObjectURL(blob)
-            );
+            const audio =
+                document.createElement(
+                    "audio"
+                );
+
+            audio.controls = true;
+
+            audio.src = url;
+
+            document
+                .getElementById(
+                    "evidenceResult"
+                )
+                .appendChild(audio);
 
         };
 
 
-    mediaRecorder.start();
+        recorder.start();
 
+        alert(
+            "Recording started. Click OK to stop."
+        );
 
-    toast(
-        "Audio recording started."
-    );
+        recorder.stop();
 
-}
+        stream
+            .getTracks()
+            .forEach(
+                track =>
+                    track.stop()
+            );
 
+    } catch (error) {
 
-function stopAudioRecording() {
-
-    if (
-        mediaRecorder &&
-        mediaRecorder.state !==
-        "inactive"
-    ) {
-
-        mediaRecorder.stop();
-
-
-        toast(
-            "Audio recording saved."
+        alert(
+            "Microphone permission was denied."
         );
 
     }
@@ -1716,308 +1761,564 @@ function stopAudioRecording() {
 }
 
 
-/* =========================================================
-   FILE UPLOAD
-   ========================================================= */
-
-function uploadFiles(event) {
+function handleEvidenceFiles(event) {
 
     const files =
-        [...event.target.files];
+        event.target.files;
 
-
-    files.forEach(file => {
-
-        const url =
-            URL.createObjectURL(file);
-
-
-        addEvidence(
-            file.name,
-            url
+    const result =
+        document.getElementById(
+            "evidenceResult"
         );
+
+    result.innerHTML =
+        "<h3>Selected Evidence</h3>";
+
+    [...files].forEach(file => {
+
+        const item =
+            document.createElement(
+                "p"
+            );
+
+        item.textContent =
+            "✓ " + file.name;
+
+        result.appendChild(item);
 
     });
 
 }
 
 
-function addEvidence(name,url) {
+/* =====================================================
+   FAKE CALL
+===================================================== */
 
-    const list =
-        document.getElementById(
-            "evidenceFiles"
-        );
+function openFakeCall() {
 
+    openModal(`
 
-    const item =
-        document.createElement("div");
+        <h2 class="modal-title">
+            Fake Calling
+        </h2>
 
+        <p class="modal-subtitle">
+            Simulate an incoming strict father call
+            in your selected language.
+        </p>
 
-    item.innerHTML = `
-
-        <a
-            href="${url}"
-            target="_blank"
+        <button
+            id="startFakeCall"
+            class="action-button"
         >
+            📞 START FAKE CALL
+        </button>
 
-            📎 ${escapeHTML(name)}
+        <p class="contact-status">
+            The call uses the selected regional language.
+        </p>
 
-        </a>
-
-    `;
+    `);
 
 
-    list.prepend(item);
+    document
+        .getElementById("startFakeCall")
+        .addEventListener(
+            "click",
+            () => {
+
+                closeModal();
+
+                setTimeout(
+                    startFakeCall,
+                    400
+                );
+
+            }
+        );
 
 }
 
 
-/* =========================================================
+function startFakeCall() {
+
+    document
+        .getElementById(
+            "fakeCallOverlay"
+        )
+        .classList.remove("hidden");
+
+}
+
+
+document
+    .getElementById("rejectFakeCall")
+    .addEventListener(
+        "click",
+        stopFakeCall
+    );
+
+
+document
+    .getElementById("answerFakeCall")
+    .addEventListener(
+        "click",
+        speakFather
+    );
+
+
+function speakFather() {
+
+    if (
+        !("speechSynthesis" in window)
+    ) {
+
+        alert(
+            "Voice synthesis is not supported in this browser."
+        );
+
+        return;
+
+    }
+
+    window.speechSynthesis.cancel();
+
+    const sentences =
+        translations[
+            selectedLanguage
+        ].father;
+
+    let index = 0;
+
+
+    function speakNext() {
+
+        if (
+            index >= sentences.length
+        ) {
+
+            return;
+
+        }
+
+        const utterance =
+            new SpeechSynthesisUtterance(
+                sentences[index]
+            );
+
+        utterance.lang =
+            speechLanguage(
+                selectedLanguage
+            );
+
+        /*
+         * Lower pitch + moderate speed
+         * creates a firmer father-like voice.
+         */
+
+        utterance.rate = .82;
+
+        utterance.pitch = .72;
+
+        utterance.volume = 1;
+
+
+        const voices =
+            window.speechSynthesis
+                .getVoices();
+
+        const matchingVoice =
+            voices.find(
+                voice =>
+                    voice.lang
+                        .toLowerCase()
+                        .startsWith(
+                            selectedLanguage
+                        )
+            );
+
+        if (matchingVoice) {
+
+            utterance.voice =
+                matchingVoice;
+
+        }
+
+
+        utterance.onend = () => {
+
+            index++;
+
+            setTimeout(
+                speakNext,
+                700
+            );
+
+        };
+
+
+        window.speechSynthesis
+            .speak(utterance);
+
+    }
+
+
+    speakNext();
+
+}
+
+
+function stopFakeCall() {
+
+    window.speechSynthesis.cancel();
+
+    document
+        .getElementById(
+            "fakeCallOverlay"
+        )
+        .classList.add("hidden");
+
+}
+
+
+/* =====================================================
+   SAFETY TIPS
+===================================================== */
+
+function openTips() {
+
+    openModal(`
+
+        <h2 class="modal-title">
+            Safety Tips
+        </h2>
+
+        <p class="modal-subtitle">
+            Practical steps that can help during an unsafe situation.
+        </p>
+
+        <div class="tips-list">
+
+            <p>🛡️ Move to a public and well-lit place.</p>
+
+            <p>📱 Keep your phone accessible.</p>
+
+            <p>👥 Contact someone you trust.</p>
+
+            <p>📍 Share your location when appropriate.</p>
+
+            <p>🚪 If possible, move toward a safe exit.</p>
+
+            <p>🚨 Contact emergency services if you are in immediate danger.</p>
+
+            <p>🎥 Preserve useful evidence when it is safe to do so.</p>
+
+            <p>💡 Trust your instincts and prioritize getting somewhere safe.</p>
+
+        </div>
+
+    `);
+
+}
+
+
+/* =====================================================
+   HELPLINES
+===================================================== */
+
+function openHelplines() {
+
+    openModal(`
+
+        <h2 class="modal-title">
+            Help Lines
+        </h2>
+
+        <p class="modal-subtitle">
+            Emergency contacts
+        </p>
+
+        <a
+            href="tel:112"
+            class="action-button red"
+            style="display:block;text-align:center;text-decoration:none"
+        >
+            🚨 Police / Emergency — 112
+        </a>
+
+        <a
+            href="tel:108"
+            class="action-button"
+            style="display:block;text-align:center;text-decoration:none"
+        >
+            🚑 Ambulance — 108
+        </a>
+
+        <a
+            href="tel:181"
+            class="action-button gold"
+            style="display:block;text-align:center;text-decoration:none"
+        >
+            👩 Women Helpline — 181
+        </a>
+
+        <p class="contact-status">
+            Use emergency services when you are in immediate danger.
+        </p>
+
+    `);
+
+}
+
+
+/* =====================================================
    BATTERY SAVER
-   ========================================================= */
+===================================================== */
+
+function openBatterySaver() {
+
+    openModal(`
+
+        <h2 class="modal-title">
+            Battery Saver Mode
+        </h2>
+
+        <p class="modal-subtitle">
+            This browser-based mode reduces unnecessary visual
+            activity and animations during an emergency.
+        </p>
+
+        <button
+            id="batteryToggle"
+            class="action-button"
+        >
+            🔋 ACTIVATE BATTERY SAVER
+        </button>
+
+        <p class="contact-status">
+            Browser websites cannot directly control the phone's
+            system battery settings.
+        </p>
+
+    `);
+
+
+    document
+        .getElementById("batteryToggle")
+        .addEventListener(
+            "click",
+            toggleBatterySaver
+        );
+
+}
+
 
 function toggleBatterySaver() {
 
     batterySaver =
         !batterySaver;
 
-
-    document.body
-        .classList.toggle(
-            "battery-on",
+    document
+        .body
+        .classList
+        .toggle(
+            "battery-saving",
             batterySaver
         );
 
-
     document
         .getElementById(
-            "batteryState"
+            "batteryIndicator"
         )
-        .textContent =
-        batterySaver
-            ? "Battery Saver is ON"
-            : "Battery Saver is OFF";
+        .classList
+        .toggle(
+            "hidden",
+            !batterySaver
+        );
 
+    const button =
+        document
+            .getElementById(
+                "batteryToggle"
+            );
 
-    document
-        .getElementById(
-            "batteryBtn"
-        )
-        .textContent =
-        batterySaver
-            ? "Disable Battery Saver"
-            : "Enable Battery Saver";
+    if (button) {
 
+        button.textContent =
+            batterySaver
+                ? "🔋 BATTERY SAVER ACTIVE"
+                : "🔋 ACTIVATE BATTERY SAVER";
 
-    toast(
-        batterySaver
-            ? "Battery Saver enabled."
-            : "Battery Saver disabled."
-    );
+    }
 
 }
 
 
-async function setupBatteryInformation() {
+/* =====================================================
+   CUSTOMER ISSUES
+===================================================== */
 
-    if (!navigator.getBattery) {
+function openCustomerIssues() {
 
-        return;
+    openModal(`
 
-    }
+        <h2 class="modal-title">
+            Customer Issues
+        </h2>
+
+        <p class="modal-subtitle">
+            Tell us about a problem or suggestion.
+        </p>
+
+        <div class="form-grid">
+
+            <input
+                id="issueName"
+                placeholder="Your name"
+            >
+
+            <input
+                id="issueEmail"
+                type="email"
+                placeholder="Email"
+            >
+
+            <textarea
+                id="issueText"
+                placeholder="Describe your issue..."
+            ></textarea>
+
+            <button
+                id="submitIssue"
+                class="form-button"
+            >
+                Submit Issue
+            </button>
+
+            <div
+                id="issueStatus"
+                class="contact-status"
+            ></div>
+
+        </div>
+
+    `);
 
 
-    try {
+    document
+        .getElementById("submitIssue")
+        .addEventListener(
+            "click",
+            () => {
 
-        const battery =
-            await navigator.getBattery();
+                const issue =
+                    document
+                        .getElementById(
+                            "issueText"
+                        )
+                        .value
+                        .trim();
 
+                if (!issue) {
 
-        function updateBattery() {
+                    document
+                        .getElementById(
+                            "issueStatus"
+                        )
+                        .textContent =
+                        "Please describe the issue.";
 
-            const percent =
-                Math.round(
-                    battery.level * 100
+                    return;
+
+                }
+
+                const issues =
+                    JSON.parse(
+                        localStorage.getItem(
+                            "sheShieldIssues"
+                        ) || "[]"
+                    );
+
+                issues.push({
+
+                    name:
+                        document
+                            .getElementById(
+                                "issueName"
+                            )
+                            .value,
+
+                    email:
+                        document
+                            .getElementById(
+                                "issueEmail"
+                            )
+                            .value,
+
+                    issue,
+
+                    date:
+                        new Date()
+                            .toLocaleString()
+
+                });
+
+                localStorage.setItem(
+                    "sheShieldIssues",
+                    JSON.stringify(
+                        issues
+                    )
                 );
 
+                document
+                    .getElementById(
+                        "issueStatus"
+                    )
+                    .textContent =
+                    "✓ Your issue has been saved for this browser session.";
 
-            document
-                .getElementById(
-                    "batteryLevel"
-                )
-                .style.width =
-                percent + "%";
-
-
-            document
-                .getElementById(
-                    "batteryInfo"
-                )
-                .textContent =
-                `Battery: ${percent}% ${
-                    battery.charging
-                        ? "• Charging"
-                        : ""
-                }`;
-
-        }
-
-
-        updateBattery();
-
-
-        battery.addEventListener(
-            "levelchange",
-            updateBattery
+            }
         );
-
-
-        battery.addEventListener(
-            "chargingchange",
-            updateBattery
-        );
-
-    }
-
-    catch {}
 
 }
 
 
-/* =========================================================
-   CUSTOMER ISSUES
-   ========================================================= */
-
-function saveIssue(event) {
-
-    event.preventDefault();
-
-
-    const issue = {
-
-        name:
-            document
-                .getElementById(
-                    "issueName"
-                )
-                .value
-                .trim(),
-
-        email:
-            document
-                .getElementById(
-                    "issueEmail"
-                )
-                .value
-                .trim(),
-
-        type:
-            document
-                .getElementById(
-                    "issueType"
-                )
-                .value,
-
-        message:
-            document
-                .getElementById(
-                    "issueText"
-                )
-                .value
-                .trim(),
-
-        date:
-            new Date()
-                .toLocaleString()
-
-    };
-
-
-    const issues =
-        JSON.parse(
-            localStorage.getItem(
-                STORAGE.issues
-            ) || "[]"
-        );
-
-
-    issues.push(issue);
-
-
-    localStorage.setItem(
-        STORAGE.issues,
-        JSON.stringify(issues)
-    );
-
-
-    document
-        .getElementById(
-            "issueStatus"
-        )
-        .textContent =
-        "Issue saved successfully.";
-
-
-    event.target.reset();
-
-}
-
-
-/* =========================================================
-   HELPER
-   ========================================================= */
+/* =====================================================
+   HTML ESCAPE
+===================================================== */
 
 function escapeHTML(value) {
 
     return String(value)
-        .replace(
-            /[&<>"']/g,
-            character => ({
-
-                "&": "&amp;",
-                "<": "&lt;",
-                ">": "&gt;",
-                '"': "&quot;",
-                "'": "&#039;"
-
-            }[character])
-        );
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 
 }
 
 
-/* =========================================================
-   CLEANUP
-   ========================================================= */
+/* =====================================================
+   INITIALIZATION
+===================================================== */
 
 window.addEventListener(
     "beforeunload",
     () => {
 
-        if (cameraStream) {
+        if (voiceRecognition) {
 
-            cameraStream
-                .getTracks()
-                .forEach(track =>
-                    track.stop()
-                );
+            try {
 
-        }
+                voiceRecognition.stop();
 
-
-        stopVoiceSOS();
-
-
-        if (
-            "speechSynthesis"
-            in window
-        ) {
-
-            speechSynthesis.cancel();
+            } catch (e) {}
 
         }
 
+        window.speechSynthesis?.cancel();
 
         stopSiren();
 
